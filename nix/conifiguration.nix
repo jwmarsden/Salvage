@@ -10,7 +10,7 @@ in
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+      /etc/nixos/hardware-configuration.nix
       (import "${home-manager}/nixos")
     ];
 
@@ -50,13 +50,13 @@ in
     LC_TIME = "en_AU.UTF-8";
   };
 
+  services.xserver.enable = true;
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "au";
     variant = "";
   };
-
-  services.xserver.enable = true;
 
   services.xserver.windowManager.qtile = {
     enable = true;
@@ -111,6 +111,7 @@ in
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     alacritty
+    btop
     home-manager
     nano
     neovim
