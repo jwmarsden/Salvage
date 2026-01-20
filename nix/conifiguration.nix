@@ -91,13 +91,14 @@ in
         allowUnfreePredicate = (_: true);
       };
     };
-    home.packages = [ 
-      pkgs.bat 
-      pkgs.google-chrome
-      pkgs.jetbrains.idea-ultimate
-      pkgs.jdk
-      pkgs.slack
-      pkgs.vscode
+    home.packages = with pkgs; [ 
+      bat 
+      google-chrome
+      jetbrains.idea
+      jdk
+      obsidian
+      slack
+      vscode
     ];
     programs.bash.enable = true;
     programs.git = {
