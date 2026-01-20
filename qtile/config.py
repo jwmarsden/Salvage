@@ -101,7 +101,7 @@ for vt in range(1, 8):
     )
 
 
-groups = [Group(i) for i in "123456789"]
+groups = [Group(i) for i in "12"]
 
 for i in groups:
     keys.extend(
@@ -134,7 +134,7 @@ layouts = [
     # layout.Stack(num_stacks=2),
     # layout.Bsp(),
     # layout.Matrix(),
-    # layout.MonadTall(),
+    layout.MonadTall(),
     # layout.MonadWide(),
     # layout.RatioTile(),
     # layout.Tile(),
@@ -145,7 +145,7 @@ layouts = [
 
 widget_defaults = dict(
     font="sans",
-    fontsize=16,
+    fontsize=18,
     padding=3,
 )
 extension_defaults = widget_defaults.copy()
@@ -232,7 +232,7 @@ wl_input_rules = None
 wl_xcursor_theme = None
 wl_xcursor_size = 24
 
-# XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
+# XXX: Gasp! We're lying here. In fact, noworkingbody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the
 # mailing lists, GitHub issues, and other WM documentation that suggest setting
 # this string if your java app doesn't work correctly. We may as well just lie

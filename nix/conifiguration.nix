@@ -94,6 +94,8 @@ in
     home.packages = [ 
       pkgs.bat 
       pkgs.google-chrome
+      pkgs.jetbrains.idea-ultimate
+      pkgs.jdk
       pkgs.slack
       pkgs.vscode
     ];
