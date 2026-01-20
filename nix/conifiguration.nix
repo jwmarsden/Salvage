@@ -65,6 +65,12 @@ in
     ];
   };
 
+  services.xserver.displayManager = {
+    sessionCommands = ''
+      xwallpaper --zoom ~/nix-config/walls/stormlight_01.png
+    '';
+  };
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
