@@ -169,6 +169,7 @@ screens = [
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
                 widget.Systray(),
+                widget.Net(interface="ens33"),
                 widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
                 widget.QuickExit(),
             ],
