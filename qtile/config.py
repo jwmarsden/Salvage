@@ -69,6 +69,7 @@ keys = [
     ),
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
     Key([mod], "b", lazy.spawn("google-chrome-stable"), desc="Launch Browser"),
+    Key([mod], "v", lazy.spawn("thunar"), desc="Launch Explorer"),
     # Toggle between different layouts as defined below
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
@@ -152,7 +153,7 @@ extension_defaults = widget_defaults.copy()
 logo = os.path.join(os.path.dirname(libqtile.resources.__file__), "logo.png")
 screens = [
     Screen(
-        bottom=bar.Bar(
+        top=bar.Bar(
             [
                 widget.CurrentLayout(),
                 widget.GroupBox(),
@@ -164,13 +165,16 @@ screens = [
                     },
                     name_transform=lambda name: name.upper(),
                 ),
-                widget.TextBox("default config", name="default"),
-                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                #widget.TextBox("default config", name="default"),
+                #widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
                 widget.Systray(),
-                widget.Net(interface="ens33"),
-                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
+                widget.CPUGraph(),
+                widget.NetGraph(interface="ens33"),
+                widget.BatteryIcon(),
+                widget.Clock(format="%Y-%m-%d"),
+                #widget.VerticalClock(format=['%H',%M]),
                 widget.QuickExit(),
             ],
             24,

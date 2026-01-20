@@ -94,7 +94,8 @@ in
     };
     home.packages = [ 
       pkgs.bat 
-      pkgs.google-chrome 
+      pkgs.google-chrome
+      pkgs.slack
       pkgs.vscode
     ];
     programs.bash.enable = true;
@@ -124,6 +125,9 @@ in
     rofi
     vim
     wget
+    xfce.thunar
+    xfce.thunar-volman
+    xfce.thunar-archive-plugin
     xwallpaper
   ];
 
