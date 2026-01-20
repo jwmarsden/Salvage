@@ -145,7 +145,7 @@ layouts = [
 
 widget_defaults = dict(
     font="sans",
-    fontsize=12,
+    fontsize=16,
     padding=3,
 )
 extension_defaults = widget_defaults.copy()
@@ -171,9 +171,9 @@ screens = [
                 # widget.StatusNotifier(),
                 widget.Systray(),
                 widget.CPUGraph(),
-                widget.NetGraph(interface="ens33"),
+                #widget.NetGraph(interface="ens33"),
                 widget.BatteryIcon(),
-                widget.Clock(format="%Y-%m-%d"),
+                widget.Clock(format="%Y-%m-%d %H:%M"),
                 #widget.VerticalClock(format=['%H',%M]),
                 widget.QuickExit(),
             ],
