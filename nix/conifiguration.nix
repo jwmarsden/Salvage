@@ -121,6 +121,7 @@ in
     home-manager
     nano
     neovim
+    rofi
     vim
     wget
     xwallpaper

@@ -68,8 +68,11 @@ keys = [
         desc="Toggle between split and unsplit sides of stack",
     ),
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+    Key([mod], "b", lazy.spawn("google-chrome-stable"), desc="Launch Browser"),
     # Toggle between different layouts as defined below
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
+    Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
+    Key([mod], "e", lazy.spawn("rofi -show drun"), desc="Run a Program with Rofi"),
     Key([mod], "w", lazy.window.kill(), desc="Kill focused window"),
     Key(
         [mod],
