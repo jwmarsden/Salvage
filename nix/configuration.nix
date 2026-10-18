@@ -5,17 +5,21 @@
 { config, pkgs, lib, ... }:
 
 let
-  home-manager = builtins.fetchTarball https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz;
+  # Tracks master to match the unstable nixos channel.
+  home-manager = builtins.fetchTarball https://github.com/nix-community/home-manager/archive/master.tar.gz;
 in
 {
   imports =
     [ # Include the results of the hardware scan.
       /etc/nixos/hardware-configuration.nix
       (import "${home-manager}/nixos")
+      ./macbook12-audio.nix
+      ./power.nix
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Use latest kernel.
@@ -31,47 +35,56 @@ in
   # Enable networking
   networking.networkmanager.enable = true;
 
+  programs.sway.enable = true;
+
   # Set your time zone.
   time.timeZone = "Australia/Adelaide";
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_AU.UTF-8";
 
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_AU.UTF-8";
-    LC_IDENTIFICATION = "en_AU.UTF-8";
-    LC_MEASUREMENT = "en_AU.UTF-8";
-    LC_MONETARY = "en_AU.UTF-8";
-    LC_NAME = "en_AU.UTF-8";
-    LC_NUMERIC = "en_AU.UTF-8";
-    LC_PAPER = "en_AU.UTF-8";
-    LC_TELEPHONE = "en_AU.UTF-8";
-    LC_TIME = "en_AU.UTF-8";
+  # Login screen that launches sway.
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd sway";
+      user = "greeter";
+    };
   };
 
-  services.xserver.enable = true;
-
-  # Configure keymap in X11
+  # Keymap (also picked up by sway's default xkb settings)
   services.xserver.xkb = {
     layout = "au";
     variant = "";
   };
 
-  services.xserver.windowManager.qtile = {
+  security.sudo.wheelNeedsPassword = false;
+
+  # Audio
+  security.rtkit.enable = true;
+  hardware.alsa.enablePersistence = true; # keep Master at 100% (speakers use soft volume)
+  services.pipewire = {
     enable = true;
-    extraPackages = python3Packages: with python3Packages; [
-      qtile-extras
-    ];
+    alsa.enable = true;
+    pulse.enable = true;
   };
 
-  services.xserver.displayManager = {
-    sessionCommands = ''
-      xwallpaper --zoom ~/nix-config/walls/stormlight_01.png
-    '';
-  };
+  # Firmware updates
+  services.fwupd.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    auto-optimise-store = true;
+  };
+
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.jwm = {
@@ -81,21 +94,19 @@ in
     # packages = with pkgs; [];
   };
 
+  # Use the system nixpkgs (and its allowUnfree) for home-manager.
+  home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
+
   home-manager.users.jwm = { pkgs, ... }: {
     # The state version is required and should stay at the version you
     # originally installed.
     home.stateVersion = "25.11";
-    nixpkgs = {
-      config = {
-        allowUnfree = true;
-        allowUnfreePredicate = (_: true);
-      };
-    };
-    home.packages = with pkgs; [ 
-      bat 
+    home.packages = with pkgs; [
+      bat
+      flameshot
       google-chrome
       jetbrains.idea
-      jdk
       obsidian
       slack
       vscode
@@ -109,6 +120,7 @@ in
       };
     };
     programs.home-manager.enable = true;
+    programs.java.enable = true;
     programs.oh-my-posh = {
       enable = true;
       useTheme = "robbyrussell";
@@ -118,30 +130,40 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     alacritty
     btop
-    home-manager
+    claude-code
     nano
-    neovim
     rofi
-    vim
     wget
-    xfce.thunar
-    xfce.thunar-volman
-    xfce.thunar-archive-plugin
-    xwallpaper
   ];
+
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+  };
+
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs; [
+      thunar-volman
+      thunar-archive-plugin
+    ];
+  };
+  services.gvfs.enable = true;    # mounting, trash, volman
+  services.tumbler.enable = true; # thumbnails
+  programs.xfconf.enable = true;  # persist Thunar settings
 
   fonts.packages = with pkgs; [
     #jetbrainsmono
     nerd-fonts.fira-code
-    nerd-fonts.droid-sans-mono    
+    nerd-fonts.droid-sans-mono
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
     liberation_ttf
-    fira-code
     fira-code-symbols
   ];
 
