@@ -1,0 +1,67 @@
+* {
+  font-family: "FiraCode Nerd Font Propo", sans-serif;
+  font-size: 14px;
+  min-height: 0;
+}
+
+window#waybar {
+  background: rgba(20, 24, 36, 0.85);
+  color: #e6e9f0;
+}
+
+/* Launcher buttons */
+#custom-chrome,
+#custom-obsidian,
+#custom-terminal,
+#custom-intellij,
+#custom-steam {
+  font-size: 17px;
+  padding: 0 10px;
+}
+#custom-chrome:hover,
+#custom-obsidian:hover,
+#custom-terminal:hover,
+#custom-intellij:hover,
+#custom-steam:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+#custom-chrome   { color: #8ab4f8; }
+#custom-obsidian { color: #a88bfa; }
+#custom-terminal { color: #9ece6a; }
+#custom-intellij { color: #ff7a59; }
+#custom-steam    { color: #c7d5e0; margin-right: 8px; }
+
+#workspaces button {
+  color: #8a90a6;
+  padding: 0 8px;
+  border-radius: 0;
+}
+#workspaces button.focused {
+  color: #ffffff;
+  background: rgba(122, 162, 247, 0.35);
+}
+#workspaces button.urgent {
+  background: #c0392b;
+}
+
+#mode {
+  background: #e0af68;
+  color: #1a1b26;
+  padding: 0 8px;
+}
+
+#clock {
+  font-weight: bold;
+}
+
+#pulseaudio,
+#network,
+#battery,
+#tray {
+  padding: 0 10px;
+}
+
+#pulseaudio.muted { color: #8a90a6; }
+#battery.warning:not(.charging)  { color: #e0af68; }
+#battery.critical:not(.charging) { color: #f7768e; }
+#network.disconnected { color: #f7768e; }

@@ -1,0 +1,83 @@
+// Waybar config for sway on salvage.
+// Reload after editing: Command+Shift+C (reloads sway, which restarts the bar).
+{
+  "layer": "top",
+  "position": "top",
+  "height": 30,
+
+  "modules-left": [
+    "custom/chrome",
+    "custom/obsidian",
+    "custom/terminal",
+    "custom/intellij",
+    "custom/steam",
+    "sway/workspaces",
+    "sway/mode"
+  ],
+  "modules-center": ["clock"],
+  "modules-right": ["pulseaudio", "network", "battery", "tray"],
+
+  // App launchers: click to open.
+  "custom/chrome": {
+    "format": "",
+    "tooltip-format": "Google Chrome",
+    "on-click": "google-chrome-stable"
+  },
+  "custom/obsidian": {
+    "format": "",
+    "tooltip-format": "Obsidian",
+    "on-click": "obsidian"
+  },
+  "custom/terminal": {
+    "format": "",
+    "tooltip-format": "Terminal",
+    "on-click": "alacritty"
+  },
+  "custom/intellij": {
+    "format": "",
+    "tooltip-format": "IntelliJ IDEA",
+    "on-click": "intellij-idea"
+  },
+  "custom/steam": {
+    "format": "",
+    "tooltip-format": "Steam",
+    "on-click": "steam"
+  },
+
+  "sway/workspaces": {
+    "disable-scroll": true
+  },
+
+  "clock": {
+    "format": "{:%a %d %b  %H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>"
+  },
+
+  // Click to open the volume mixer; scroll to change volume.
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": " muted",
+    "format-icons": { "headphone": "", "default": ["", "", ""] },
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+
+  "network": {
+    "format-wifi": " {essid}",
+    "format-ethernet": " wired",
+    "format-disconnected": " offline",
+    "tooltip-format": "{ifname} {ipaddr}"
+  },
+
+  "battery": {
+    "states": { "warning": 25, "critical": 10 },
+    "format": "{icon} {capacity}%",
+    "format-charging": " {capacity}%",
+    "format-plugged": " {capacity}%",
+    "format-icons": ["", "", "", "", ""]
+  },
+
+  "tray": {
+    "spacing": 8
+  }
+}
