@@ -134,9 +134,14 @@ in
     btop
     claude-code
     nano
+    pavucontrol
     rofi
+    waybar
     wget
   ];
+
+  # Steam (also enables 32-bit graphics libraries for games).
+  programs.steam.enable = true;
 
   programs.neovim = {
     enable = true;
