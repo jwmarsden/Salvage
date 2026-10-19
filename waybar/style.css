@@ -10,17 +10,20 @@ window#waybar {
 }
 
 /* Launcher buttons */
+#custom-thunar,
 #custom-chrome,
 #custom-terminal,
 #custom-vscode {
   font-size: 17px;
   padding: 0 10px;
 }
+#custom-thunar:hover,
 #custom-chrome:hover,
 #custom-terminal:hover,
 #custom-vscode:hover {
   background: rgba(255, 255, 255, 0.12);
 }
+#custom-thunar   { color: #e0af68; }
 #custom-chrome   { color: #8ab4f8; }
 #custom-terminal { color: #9ece6a; }
 #custom-vscode   { color: #3ea6f2; margin-right: 8px; }
@@ -51,6 +54,7 @@ window#waybar {
 #pulseaudio,
 #network,
 #power-profiles-daemon,
+#temperature,
 #battery,
 #tray {
   padding: 0 10px;
@@ -64,3 +68,5 @@ window#waybar {
 #power-profiles-daemon.performance { color: #f7768e; }
 #power-profiles-daemon.balanced    { color: #7aa2f7; }
 #power-profiles-daemon.power-saver { color: #9ece6a; }
+
+#temperature.critical { color: #f7768e; }

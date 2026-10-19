@@ -6,6 +6,7 @@
   "height": 30,
 
   "modules-left": [
+    "custom/thunar",
     "custom/chrome",
     "custom/terminal",
     "custom/vscode",
@@ -13,9 +14,14 @@
     "sway/mode"
   ],
   "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "network", "power-profiles-daemon", "battery", "tray"],
+  "modules-right": ["pulseaudio", "network", "power-profiles-daemon", "temperature", "battery", "tray"],
 
   // App launchers: click to open.
+  "custom/thunar": {
+    "format": "",
+    "tooltip-format": "Files (Thunar)",
+    "on-click": "thunar"
+  },
   "custom/chrome": {
     "format": "",
     "tooltip-format": "Google Chrome",
@@ -67,6 +73,18 @@
       "balanced": "󰗑",
       "power-saver": "󰌪"
     }
+  },
+
+  // CPU package temperature (fanless: it throttles itself at 100°C).
+  // Turns red from 90°C; click for btop.
+  "temperature": {
+    "hwmon-path-abs": "/sys/devices/platform/coretemp.0/hwmon",
+    "input-filename": "temp1_input",
+    "critical-threshold": 90,
+    "format": "{icon} {temperatureC}°C",
+    "format-icons": ["\uf2cb", "\uf2ca", "\uf2c9", "\uf2c8", "\uf2c7"],
+    "tooltip-format": "CPU package: {temperatureC}°C",
+    "on-click": "foot btop"
   },
 
   "battery": {

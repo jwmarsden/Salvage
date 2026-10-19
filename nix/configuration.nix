@@ -87,6 +87,12 @@ in
 
   security.sudo.wheelNeedsPassword = false;
 
+  # Keyring (Secret Service) for saved logins: gh, VS Code, Chrome, etc.
+  # Unlocked automatically with your password at the greetd login.
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.greetd.enableGnomeKeyring = true;
+  programs.seahorse.enable = true; # GUI to view/manage saved passwords
+
   # Audio
   security.rtkit.enable = true;
   hardware.alsa.enablePersistence = true; # keep Master at 100% (speakers use soft volume)
@@ -138,9 +144,10 @@ in
       drawio # draw.io diagram editor
       flameshot
       fuzzel
-      github-desktop
+      git-lfs
       google-chrome
       hunspellDicts.en_AU # spell checking for LibreOffice
+      kdePackages.okular # PDF annotation/forms/signing (zathura is the default viewer)
       jetbrains.idea
       jetbrains.pycharm
       libreoffice-fresh
@@ -175,6 +182,14 @@ in
       settings = {
         user.name = "J.W.Marsden";
         user.email = "j.w.marsden@gmail.com";
+        # Git LFS filters, written exactly as `git lfs install` would, since it
+        # cannot write to this read-only config and complains about store paths.
+        filter.lfs = {
+          clean = "git-lfs clean -- %f";
+          smudge = "git-lfs smudge -- %f";
+          process = "git-lfs filter-process";
+          required = true;
+        };
       };
     };
     # Slightly see-through terminals so the wallpaper shows
@@ -262,6 +277,58 @@ in
       };
       theme.flavor = { dark = "tokyo-night"; light = "tokyo-night"; };
     };
+    # GitHub CLI. `gh auth login` once; it also acts as git's credential
+    # helper, so pushes to github.com over HTTPS use that login.
+    programs.gh = {
+      enable = true;
+      settings.git_protocol = "https";
+    };
+    # Tokyo Night for all GTK apps (Thunar, pavucontrol, file dialogs, ...),
+    # with Papirus icons in matching indigo folders.
+    gtk = {
+      enable = true;
+      theme = {
+        name = "Tokyonight-Dark";
+        package = pkgs.tokyonight-gtk-theme;
+      };
+      iconTheme = {
+        name = "Papirus-Dark";
+        package = pkgs.papirus-icon-theme.override { color = "indigo"; };
+      };
+    };
+    # Also tell GTK4/libadwaita apps and portals to prefer dark.
+    dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
+    # Keyboard-driven PDF viewer (default for PDFs), Tokyo Night colours.
+    # Copy selected text to the clipboard, and recolour pages with Ctrl+R.
+    programs.zathura = {
+      enable = true;
+      options = {
+        selection-clipboard = "clipboard";
+        adjust-open = "width";
+        font = "FiraCode Nerd Font Mono 10";
+        default-bg = "#1a1b26";
+        default-fg = "#c0caf5";
+        statusbar-bg = "#24283b";
+        statusbar-fg = "#c0caf5";
+        inputbar-bg = "#1a1b26";
+        inputbar-fg = "#c0caf5";
+        notification-bg = "#1a1b26";
+        notification-fg = "#c0caf5";
+        notification-error-bg = "#1a1b26";
+        notification-error-fg = "#f7768e";
+        notification-warning-bg = "#1a1b26";
+        notification-warning-fg = "#e0af68";
+        highlight-color = "rgba(122,162,247,0.4)";
+        highlight-active-color = "rgba(187,154,247,0.5)";
+        completion-bg = "#24283b";
+        completion-fg = "#c0caf5";
+        completion-highlight-bg = "#3d59a1";
+        completion-highlight-fg = "#ffffff";
+        recolor-lightcolor = "#1a1b26";
+        recolor-darkcolor = "#c0caf5";
+        recolor-keephue = true;
+      };
+    };
     # Terminal git UI (Super+G, or `lazygit` inside a repo).
     programs.lazygit = {
       enable = true;
@@ -335,6 +402,7 @@ in
   services.gvfs.enable = true;    # mounting, trash, volman
   services.tumbler.enable = true; # thumbnails
   programs.xfconf.enable = true;  # persist Thunar settings
+  programs.dconf.enable = true;   # GTK/dark-mode settings from home-manager
 
   fonts.packages = with pkgs; [
     #jetbrainsmono
