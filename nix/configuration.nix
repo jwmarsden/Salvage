@@ -149,6 +149,7 @@ in
     home.stateVersion = "25.11";
     home.packages = with pkgs; [
       bat
+      dbeaver-bin # database client (Community Edition)
       # Bitwarden: desktop app, plus rbw + rofi-rbw for Super+P (fuzzel
       # picker that types/copies logins into any app). One-time setup:
       # `rbw config set email <you>` then `rbw login`.
@@ -298,6 +299,46 @@ in
       enable = true;
       settings.git_protocol = "https";
     };
+    # Launcher (Super+D) tidy-up: entries in ~/.local/share/applications
+    # override the installed ones with the same file name. Apps stay
+    # installed; this only changes what fuzzel lists and what it's called.
+    xdg.dataFile =
+      let
+        hide = id: {
+          name = "applications/${id}.desktop";
+          value.text = "[Desktop Entry]\nType=Application\nName=${id}\nNoDisplay=true\n";
+        };
+        # Hide, but keep the original entry so its file types (MimeType)
+        # still work, e.g. nvim for text files.
+        hideKeep = id: pkg: {
+          name = "applications/${id}.desktop";
+          value.source = pkgs.runCommand "${id}.desktop" { } ''
+            sed -e '/^NoDisplay=/d' \
+                -e '0,/^\[Desktop Entry\]/s||[Desktop Entry]\nNoDisplay=true|' \
+              ${pkg}/share/applications/${id}.desktop > $out
+          '';
+        };
+        rename = id: pkg: newName: {
+          name = "applications/${id}.desktop";
+          value.source = pkgs.runCommand "${id}.desktop" { } ''
+            sed '0,/^Name=/s|^Name=.*|Name=${newName}|' \
+              ${pkg}/share/applications/${id}.desktop > $out
+          '';
+        };
+      in
+      builtins.listToAttrs (map hide [
+        "footclient" "foot-server"
+        "thunar-bulk-rename" "thunar-settings" "thunar-volman-settings"
+        "nm-connection-editor" "nixos-manual"
+        "org.flameshot.Flameshot" "Alacritty" "btop" "maestral"
+      ] ++ [
+        (hideKeep "nvim" config.programs.neovim.finalPackage)
+        (hideKeep "base" pkgs.libreoffice-fresh)
+        (hideKeep "math" pkgs.libreoffice-fresh)
+        (rename "dbeaver" pkgs.dbeaver-bin "DBeaver")
+        (rename "drawio" pkgs.drawio "draw.io")
+        (rename "thunar" pkgs.thunar "Files (Thunar)")
+      ]);
     # Tokyo Night for all GTK apps (Thunar, pavucontrol, file dialogs, ...),
     # with Papirus icons in matching indigo folders.
     gtk = {
