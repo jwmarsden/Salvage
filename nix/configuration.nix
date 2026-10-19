@@ -38,6 +38,7 @@ in
       (import "${home-manager}/nixos")
       ./macbook12-audio.nix
       ./power.nix
+      ./boot-splash.nix
     ];
 
   # Bootloader.
@@ -57,6 +58,9 @@ in
 
   # Enable networking
   networking.networkmanager.enable = true;
+  # Tray icon (waybar) for switching Wi-Fi and adding networks; the Wi-Fi
+  # password is saved in the keyring. Started with the sway session.
+  programs.nm-applet.enable = true;
 
   programs.sway.enable = true;
 
@@ -74,7 +78,11 @@ in
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd sway";
+      # Colours come from the Tokyo Night console palette (boot-splash.nix).
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --asterisks"
+        + " --window-padding 2 --container-padding 2"
+        + " --theme 'border=blue;title=blue;greet=cyan;text=white;time=cyan;container=black;prompt=magenta;input=white;action=blue;button=yellow'"
+        + " --cmd sway";
       user = "greeter";
     };
   };
@@ -141,6 +149,13 @@ in
     home.stateVersion = "25.11";
     home.packages = with pkgs; [
       bat
+      # Bitwarden: desktop app, plus rbw + rofi-rbw for Super+P (fuzzel
+      # picker that types/copies logins into any app). One-time setup:
+      # `rbw config set email <you>` then `rbw login`.
+      bitwarden-desktop
+      rbw
+      rofi-rbw-wayland
+      pinentry-gnome3 # master-password prompt for rbw
       drawio # draw.io diagram editor
       flameshot
       fuzzel
@@ -295,6 +310,12 @@ in
         name = "Papirus-Dark";
         package = pkgs.papirus-icon-theme.override { color = "indigo"; };
       };
+      # Interface font (menus, dialogs, Thunar); monospace is Victor Mono.
+      font = {
+        name = "IBM Plex Sans";
+        size = 10;
+        package = pkgs.ibm-plex;
+      };
     };
     # Also tell GTK4/libadwaita apps and portals to prefer dark.
     dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
@@ -305,7 +326,7 @@ in
       options = {
         selection-clipboard = "clipboard";
         adjust-open = "width";
-        font = "FiraCode Nerd Font Mono 10";
+        font = "VictorMono Nerd Font Mono 10";
         default-bg = "#1a1b26";
         default-fg = "#c0caf5";
         statusbar-bg = "#24283b";
@@ -377,6 +398,17 @@ in
   # lets us set policies/prefs/extensions declaratively (programs.firefox.*).
   programs.firefox.enable = true;
 
+  # Bitwarden browser extension, installed automatically in Firefox and
+  # Chrome (programs.chromium writes Chrome's policies too).
+  programs.firefox.policies.ExtensionSettings."{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
+    installation_mode = "normal_installed";
+    install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+  };
+  programs.chromium = {
+    enable = true;
+    extensions = [ "nngceckbapebfimnlniiiahkandclblb" ]; # Bitwarden
+  };
+
   # OneDrive (abraunegg client): syncs ~/OneDrive in the background from login.
   # One-time setup: run `onedrive` and follow the sign-in prompt, then
   # `systemctl --user start onedrive@onedrive`.
@@ -414,12 +446,24 @@ in
     liberation_ttf
     fira-code-symbols
     nerd-fonts.symbols-only # prompt icons for oh-my-posh
+    # Narrower monospace candidates (try: foot -f "<name>:size=11")
+    nerd-fonts.iosevka        # "Iosevka Nerd Font Mono"
+    nerd-fonts.jetbrains-mono # "JetBrainsMono Nerd Font Mono"
+    nerd-fonts.victor-mono    # "VictorMono Nerd Font Mono"
+    nerd-fonts.blex-mono      # "BlexMono Nerd Font Mono" (IBM Plex Mono)
+    ibm-plex                  # IBM Plex Mono/Sans/Serif, original names
   ];
   # Terminals (foot, alacritty) use "monospace"; point it at a Nerd Font so
   # prompt glyphs render instead of boxes.
   fonts.fontconfig.defaultFonts.monospace = [
-    "FiraCode Nerd Font Mono"
+    "VictorMono Nerd Font Mono"
     "Symbols Nerd Font Mono"
+  ];
+  # Default proportional font for apps that ask for "sans-serif"
+  # (Qt apps like Okular, web pages without their own font, etc.).
+  fonts.fontconfig.defaultFonts.sansSerif = [
+    "IBM Plex Sans"
+    "Noto Sans"
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

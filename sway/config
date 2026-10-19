@@ -21,7 +21,7 @@ set $menu fuzzel
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /run/current-system/sw/share/backgrounds/sway/)
-output * bg /home/jwm/nix-config/walls/stormlight_01.png fill
+output * bg /home/jwm/nix-config/walls/stormlight_02.png fill
 #
 # Example configuration:
 #
@@ -88,6 +88,9 @@ output * bg /home/jwm/nix-config/walls/stormlight_01.png fill
 
     # Git UI (lazygit; opens the recent-repos list when not in a repo)
     bindsym $mod+g exec $term lazygit
+
+    # Passwords: pick a Bitwarden login in fuzzel, then type or copy it
+    bindsym $mod+p exec rofi-rbw --selector fuzzel --typer wtype --clipboarder wl-copy
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
@@ -262,7 +265,7 @@ bindsym $mod+r mode "resize"
 default_border pixel 2
 default_floating_border normal
 hide_edge_borders --i3 smart  # no border when a window is alone on a workspace
-font pango:FiraCode Nerd Font Propo 10
+font pango:VictorMono Nerd Font Propo 10
 
 # class                 border  background text    indicator child_border
 client.focused          #7aa2f7 #3d59a1    #ffffff #7dcfff   #7aa2f7

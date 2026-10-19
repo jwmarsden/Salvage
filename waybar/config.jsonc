@@ -60,7 +60,9 @@
     "format-wifi": " {essid}",
     "format-ethernet": " wired",
     "format-disconnected": " offline",
-    "tooltip-format": "{ifname} {ipaddr}"
+    "tooltip-format": "{ifname} {ipaddr}\nClick: pick a network  Right-click: settings",
+    "on-click": "foot nmtui connect",
+    "on-click-right": "nm-connection-editor"
   },
 
   // Power mode: click to cycle performance / balanced / power-saver.
