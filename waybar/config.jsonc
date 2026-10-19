@@ -7,15 +7,13 @@
 
   "modules-left": [
     "custom/chrome",
-    "custom/obsidian",
     "custom/terminal",
-    "custom/intellij",
-    "custom/steam",
+    "custom/vscode",
     "sway/workspaces",
     "sway/mode"
   ],
   "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "network", "battery", "tray"],
+  "modules-right": ["pulseaudio", "network", "power-profiles-daemon", "battery", "tray"],
 
   // App launchers: click to open.
   "custom/chrome": {
@@ -23,25 +21,15 @@
     "tooltip-format": "Google Chrome",
     "on-click": "google-chrome-stable"
   },
-  "custom/obsidian": {
-    "format": "",
-    "tooltip-format": "Obsidian",
-    "on-click": "obsidian"
-  },
   "custom/terminal": {
     "format": "",
     "tooltip-format": "Terminal",
     "on-click": "alacritty"
   },
-  "custom/intellij": {
-    "format": "",
-    "tooltip-format": "IntelliJ IDEA",
-    "on-click": "intellij-idea"
-  },
-  "custom/steam": {
-    "format": "",
-    "tooltip-format": "Steam",
-    "on-click": "steam"
+  "custom/vscode": {
+    "format": "󰨞",
+    "tooltip-format": "VS Code",
+    "on-click": "code"
   },
 
   "sway/workspaces": {
@@ -67,6 +55,18 @@
     "format-ethernet": " wired",
     "format-disconnected": " offline",
     "tooltip-format": "{ifname} {ipaddr}"
+  },
+
+  // Power mode: click to cycle performance / balanced / power-saver.
+  "power-profiles-daemon": {
+    "format": "{icon}",
+    "tooltip-format": "Power mode: {profile}\nClick to change",
+    "format-icons": {
+      "default": "󰗑",
+      "performance": "󰓅",
+      "balanced": "󰗑",
+      "power-saver": "󰌪"
+    }
   },
 
   "battery": {

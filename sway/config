@@ -16,7 +16,7 @@ set $right l
 # Your preferred terminal emulator
 set $term foot
 # Your preferred application launcher
-set $menu wmenu-run
+set $menu fuzzel
 
 ### Output configuration
 #
@@ -73,8 +73,21 @@ output * bg /home/jwm/nix-config/walls/stormlight_01.png fill
     # Middle-click a window's title bar to close it
     bindsym --release button2 kill
 
+    # Screenshots (saved to ~/Pictures/Screenshots and copied to the clipboard)
+    bindsym $mod+Shift+s exec screenshot area
+    bindsym $mod+Shift+a exec screenshot full
+
     # Start your launcher
     bindsym $mod+d exec $menu
+
+    # Launch VS Code
+    bindsym $mod+c exec code
+
+    # File manager (yazi in a terminal)
+    bindsym $mod+y exec $term yazi
+
+    # Git UI (lazygit; opens the recent-repos list when not in a repo)
+    bindsym $mod+g exec $term lazygit
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
@@ -137,6 +150,20 @@ output * bg /home/jwm/nix-config/walls/stormlight_01.png fill
     bindsym $mod+Shift+8 move container to workspace number 8
     bindsym $mod+Shift+9 move container to workspace number 9
     bindsym $mod+Shift+0 move container to workspace number 10
+    # Move focused container to workspace and follow it
+    bindsym $mod+Ctrl+1 move container to workspace number 1; workspace number 1
+    bindsym $mod+Ctrl+2 move container to workspace number 2; workspace number 2
+    bindsym $mod+Ctrl+3 move container to workspace number 3; workspace number 3
+    bindsym $mod+Ctrl+4 move container to workspace number 4; workspace number 4
+    bindsym $mod+Ctrl+5 move container to workspace number 5; workspace number 5
+    bindsym $mod+Ctrl+6 move container to workspace number 6; workspace number 6
+    bindsym $mod+Ctrl+7 move container to workspace number 7; workspace number 7
+    bindsym $mod+Ctrl+8 move container to workspace number 8; workspace number 8
+    bindsym $mod+Ctrl+9 move container to workspace number 9; workspace number 9
+    bindsym $mod+Ctrl+0 move container to workspace number 10; workspace number 10
+    # Three-finger trackpad swipe between workspaces (macOS direction)
+    bindgesture swipe:3:left workspace next
+    bindgesture swipe:3:right workspace prev
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
 #

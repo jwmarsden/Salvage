@@ -11,25 +11,19 @@ window#waybar {
 
 /* Launcher buttons */
 #custom-chrome,
-#custom-obsidian,
 #custom-terminal,
-#custom-intellij,
-#custom-steam {
+#custom-vscode {
   font-size: 17px;
   padding: 0 10px;
 }
 #custom-chrome:hover,
-#custom-obsidian:hover,
 #custom-terminal:hover,
-#custom-intellij:hover,
-#custom-steam:hover {
+#custom-vscode:hover {
   background: rgba(255, 255, 255, 0.12);
 }
 #custom-chrome   { color: #8ab4f8; }
-#custom-obsidian { color: #a88bfa; }
 #custom-terminal { color: #9ece6a; }
-#custom-intellij { color: #ff7a59; }
-#custom-steam    { color: #c7d5e0; margin-right: 8px; }
+#custom-vscode   { color: #3ea6f2; margin-right: 8px; }
 
 #workspaces button {
   color: #8a90a6;
@@ -56,6 +50,7 @@ window#waybar {
 
 #pulseaudio,
 #network,
+#power-profiles-daemon,
 #battery,
 #tray {
   padding: 0 10px;
@@ -65,3 +60,7 @@ window#waybar {
 #battery.warning:not(.charging)  { color: #e0af68; }
 #battery.critical:not(.charging) { color: #f7768e; }
 #network.disconnected { color: #f7768e; }
+
+#power-profiles-daemon.performance { color: #f7768e; }
+#power-profiles-daemon.balanced    { color: #7aa2f7; }
+#power-profiles-daemon.power-saver { color: #9ece6a; }
