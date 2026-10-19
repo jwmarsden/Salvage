@@ -254,6 +254,26 @@ bindsym $mod+r mode "resize"
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
+### Appearance
+#
+# No title bars on tiled windows: just a thin border, Tokyo Night blue when
+# focused. Floating windows (dialogs, popups) keep their title bar.
+# Tabbed/stacked layouts still show tabs.
+default_border pixel 2
+default_floating_border normal
+hide_edge_borders --i3 smart  # no border when a window is alone on a workspace
+font pango:FiraCode Nerd Font Propo 10
+
+# class                 border  background text    indicator child_border
+client.focused          #7aa2f7 #3d59a1    #ffffff #7dcfff   #7aa2f7
+client.focused_inactive #414868 #24283b    #c0caf5 #414868   #414868
+client.unfocused        #24283b #1a1b26    #a9b1d6 #24283b   #24283b
+client.urgent           #f7768e #f7768e    #1a1b26 #f7768e   #f7768e
+
+# Show / hide the focused window's title bar.
+bindsym $mod+t border normal
+bindsym $mod+Shift+t border pixel 2
+
 bar {
     # Waybar replaces swaybar; its config is in ~/.config/waybar/.
     swaybar_command waybar
