@@ -92,6 +92,12 @@ output * bg /home/jwm/nix-config/walls/stormlight_02.png fill
     # Passwords: pick a Bitwarden login in fuzzel, then type or copy it
     bindsym $mod+p exec rofi-rbw --selector fuzzel --typer wtype --clipboarder wl-copy
 
+    # Lock the screen now (swayidle runs swaylock)
+    bindsym $mod+Escape exec loginctl lock-session
+
+    # Clipboard history: pick an earlier copy in fuzzel
+    bindsym $mod+Shift+v exec cliphist list | fuzzel --dmenu --prompt 'clip> ' | cliphist decode | wl-copy
+
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
     # Despite the name, also works for non-floating windows.
@@ -249,6 +255,13 @@ bindsym $mod+r mode "resize"
     # Special keys to adjust brightness via brightnessctl
     bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
     bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+
+    # Keyboard backlight (F5/F6)
+    bindsym --locked XF86KbdBrightnessDown exec brightnessctl --device='spi::kbd_backlight' set 10%-
+    bindsym --locked XF86KbdBrightnessUp exec brightnessctl --device='spi::kbd_backlight' set 10%+
+
+    # Lid closed on the charger (no shutdown then, see power.nix): lock
+    bindswitch --reload --locked lid:on exec loginctl lock-session
 
     # Special key to take a screenshot with grim
     bindsym Print exec grim

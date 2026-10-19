@@ -68,6 +68,27 @@ in
   services.thermald.enable = true;
   services.power-profiles-daemon.enable = true;
 
+  # Bluetooth; pair devices from the blueman tray icon (home-manager below).
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
+  services.blueman.enable = true;
+
+  # Compressed swap in RAM for this 8 GB machine; used before the disk swap.
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+  };
+
+  # Docker. Not started at boot to save battery: the socket starts the
+  # daemon on the first `docker` command. Includes `docker compose`.
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = false;
+    autoPrune.enable = true; # weekly cleanup of unused images/containers
+  };
+
   # Set your time zone.
   time.timeZone = "Australia/Adelaide";
 
@@ -131,7 +152,7 @@ in
   users.users.jwm = {
     isNormalUser = true;
     # description = "JWM";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
     # packages = with pkgs; [];
   };
@@ -176,6 +197,7 @@ in
       rustup
       gcc
       vscode
+      vlc # video/audio player
     ];
     programs.bash.enable = true;
     # Login shell: highlights commands as you type (green = valid, red = unknown)
@@ -330,7 +352,7 @@ in
         "footclient" "foot-server"
         "thunar-bulk-rename" "thunar-settings" "thunar-volman-settings"
         "nm-connection-editor" "nixos-manual"
-        "org.flameshot.Flameshot" "Alacritty" "btop" "maestral"
+        "org.flameshot.Flameshot" "Alacritty" "btop" "maestral" "blueman-adapters"
       ] ++ [
         (hideKeep "nvim" config.programs.neovim.finalPackage)
         (hideKeep "base" pkgs.libreoffice-fresh)
@@ -396,6 +418,116 @@ in
       enable = true;
       settings.notARepository = "skip"; # outside a repo, show recent repos
     };
+
+    # Per-project environments: a `.envrc` containing `use nix` (or
+    # `use flake`) loads that project's shell.nix/flake on `cd`.
+    # Run `direnv allow` once in each project.
+    programs.direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+
+    # Image viewer (default for images in Thunar).
+    programs.imv = {
+      enable = true;
+      settings.options.background = "1a1b26";
+    };
+
+    # Notifications, Tokyo Night colours. `makoctl dismiss -a` clears them.
+    services.mako = {
+      enable = true;
+      settings = {
+        font = "IBM Plex Sans 10";
+        background-color = "#1a1b26";
+        text-color = "#c0caf5";
+        border-color = "#7aa2f7";
+        progress-color = "over #414868";
+        border-size = 2;
+        border-radius = 6;
+        padding = 10;
+        margin = 10;
+        width = 350;
+        default-timeout = 8000;
+        "urgency=critical" = {
+          border-color = "#f7768e";
+          default-timeout = 0;
+        };
+      };
+    };
+
+    # Lock screen (swaylock-effects: blurred screenshot, Tokyo Night ring).
+    programs.swaylock = {
+      enable = true;
+      package = pkgs.swaylock-effects;
+      settings = {
+        screenshots = true;
+        effect-blur = "8x4";
+        effect-vignette = "0.4:0.8";
+        clock = true;
+        timestr = "%H:%M";
+        datestr = "%A %e %B";
+        font = "IBM Plex Sans";
+        indicator = true;
+        indicator-radius = 110;
+        indicator-thickness = 8;
+        fade-in = 0.2;
+        ignore-empty-password = true;
+        show-failed-attempts = true;
+        inside-color = "1a1b26cc";
+        inside-clear-color = "1a1b26cc";
+        inside-ver-color = "1a1b26cc";
+        inside-wrong-color = "1a1b26cc";
+        ring-color = "414868";
+        ring-clear-color = "e0af68";
+        ring-ver-color = "7aa2f7";
+        ring-wrong-color = "f7768e";
+        key-hl-color = "7dcfff";
+        bs-hl-color = "f7768e";
+        line-color = "00000000";
+        line-clear-color = "00000000";
+        line-ver-color = "00000000";
+        line-wrong-color = "00000000";
+        separator-color = "00000000";
+        text-color = "c0caf5";
+        text-clear-color = "e0af68";
+        text-ver-color = "7aa2f7";
+        text-wrong-color = "f7768e";
+      };
+    };
+
+    # Lock after 5 min idle, screen off after 10 min. Super+Escape (or
+    # `loginctl lock-session`) locks straight away. There's no suspend on
+    # this machine (power.nix), so there's no before-sleep hook.
+    services.swayidle =
+      let
+        lock = "${pkgs.swaylock-effects}/bin/swaylock -f";
+      in
+      {
+        enable = true;
+        timeouts = [
+          { timeout = 300; command = lock; }
+          {
+            timeout = 600;
+            command = "${pkgs.sway}/bin/swaymsg 'output * power off'";
+            resumeCommand = "${pkgs.sway}/bin/swaymsg 'output * power on'";
+          }
+        ];
+        events.lock = lock;
+      };
+
+    # Clipboard history; Super+Shift+V picks an earlier entry.
+    services.cliphist.enable = true;
+
+    # Warmer screen colours from sunset to sunrise (Adelaide).
+    services.wlsunset = {
+      enable = true;
+      latitude = -34.9;
+      longitude = 138.6;
+      temperature.night = 4000;
+    };
+
+    # Bluetooth tray icon.
+    services.blueman-applet.enable = true;
     programs.home-manager.enable = true;
     programs.java.enable = true;
     programs.oh-my-posh = {
@@ -407,6 +539,11 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    # Archive manager (also Thunar's "Extract here" / "Create archive"),
+    # with 7-Zip for .7z and .rar.
+    file-roller
+    _7zz-rar
+    libnotify # notify-send
     alacritty
     btop
     claude-code
