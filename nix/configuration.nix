@@ -283,6 +283,9 @@ in
           width = 2;
           radius = 8;
         };
+        # Same icons as GTK apps; also finds VS Code's icon, which only
+        # ships in a 1024px size that the default (hicolor) lookup misses.
+        main.icon-theme = "Papirus-Dark";
       };
     };
     # Dropbox: start the Maestral tray app with sway. It runs the sync daemon
@@ -353,10 +356,16 @@ in
         "thunar-bulk-rename" "thunar-settings" "thunar-volman-settings"
         "nm-connection-editor" "nixos-manual"
         "org.flameshot.Flameshot" "Alacritty" "btop" "maestral" "blueman-adapters"
+        "qt5ct" "qt6ct" # Qt theme settings (managed here)
       ] ++ [
         (hideKeep "nvim" config.programs.neovim.finalPackage)
         (hideKeep "base" pkgs.libreoffice-fresh)
         (hideKeep "math" pkgs.libreoffice-fresh)
+        # Still open files/folders, just not listed (Super+Y runs yazi;
+        # archives open from Thunar).
+        (hideKeep "yazi" pkgs.yazi)
+        (hideKeep "org.gnome.FileRoller" pkgs.file-roller)
+        (rename "vlc" pkgs.vlc "VLC")
         (rename "dbeaver" pkgs.dbeaver-bin "DBeaver")
         (rename "drawio" pkgs.drawio "draw.io")
         (rename "thunar" pkgs.thunar "Files (Thunar)")
@@ -382,6 +391,49 @@ in
     };
     # Also tell GTK4/libadwaita apps and portals to prefer dark.
     dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
+
+    # Qt apps (VLC, Okular, DBeaver dialogs...): Fusion style with a Tokyo
+    # Night palette through qt5ct/qt6ct, Papirus icons, the same fonts as GTK.
+    # Takes effect for apps started after logging in again.
+    qt = {
+      enable = true;
+      platformTheme.name = "qtct";
+    };
+    xdg.configFile =
+      let
+        # Roles in qtct order: WindowText Button Light Midlight Dark Mid Text
+        # BrightText ButtonText Base Window Shadow Highlight HighlightedText
+        # Link LinkVisited AlternateBase NoRole ToolTipBase ToolTipText
+        # PlaceholderText
+        palette = active: disabled: lib.concatMapStringsSep ", " (c: "#ff${c}") [
+          active "292e42" "3b4261" "2f3549" "16161e" "24283b" active
+          "ffffff" active "16161e" "1a1b26" "000000" "7aa2f7" "1a1b26"
+          "7aa2f7" "bb9af7" "1f2335" "1a1b26" "24283b" "c0caf5" disabled
+        ];
+        colors = pkgs.writeText "TokyoNight.conf" ''
+          [ColorScheme]
+          active_colors=${palette "c0caf5" "565f89"}
+          inactive_colors=${palette "c0caf5" "565f89"}
+          disabled_colors=${palette "565f89" "414868"}
+        '';
+        qtct = name: {
+          "${name}/colors/TokyoNight.conf".source = colors;
+          "${name}/${name}.conf".text = lib.generators.toINI { } {
+            Appearance = {
+              style = "Fusion";
+              custom_palette = true;
+              color_scheme_path = "/home/jwm/.config/${name}/colors/TokyoNight.conf";
+              icon_theme = "Papirus-Dark";
+              standard_dialogs = "default";
+            };
+            Fonts = {
+              general = ''"IBM Plex Sans,10"'';
+              fixed = ''"VictorMono Nerd Font Mono,10"'';
+            };
+          };
+        };
+      in
+      qtct "qt5ct" // qtct "qt6ct";
     # Keyboard-driven PDF viewer (default for PDFs), Tokyo Night colours.
     # Copy selected text to the clipboard, and recolour pages with Ctrl+R.
     programs.zathura = {
