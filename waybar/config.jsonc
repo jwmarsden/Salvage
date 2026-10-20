@@ -39,7 +39,26 @@
   },
 
   "sway/workspaces": {
-    "disable-scroll": true
+    "disable-scroll": true,
+    // Number plus a small icon for each app open on the workspace.
+    "format": "{name} <span size='small'>{windows}</span>",
+    "window-format": "{}",
+    "format-window-separator": " ",
+    "window-rewrite-default": "\uf2d0",
+    "window-rewrite": {
+      "class<.*chrome.*>": "",
+      "class<.*firefox.*>": "",
+      "class<foot>": "",
+      "class<code.*>": "󰨞",
+      "class<[Tt]hunar>": "",
+      "class<obsidian>": "󰠮",
+      "class<.*qgis.*>": "",
+      "class<vlc>": "󰕼",
+      "class<.*qbittorrent.*>": "",
+      "class<.*podman.*>": "",
+      "class<.*pavucontrol.*>": "",
+      "class<.*steam.*>": ""
+    }
   },
 
   "clock": {

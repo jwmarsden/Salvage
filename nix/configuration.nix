@@ -293,6 +293,12 @@ in
     # Both use the Tokyo Night palette (same blues as waybar and fuzzel).
     programs.foot = {
       enable = true;
+      # Victor Mono's italic is a cursive script; use its plain slanted
+      # (oblique) style for italic text instead.
+      settings.main = {
+        font-italic = "VictorMono Nerd Font Mono:style=Oblique";
+        font-bold-italic = "VictorMono Nerd Font Mono:style=Bold Oblique";
+      };
       settings.colors-dark = {
         alpha = 0.85;
         background = "1a1b26";
