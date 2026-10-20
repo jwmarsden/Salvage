@@ -239,6 +239,8 @@ in
       vscode
       vlc # video/audio player
       qbittorrent # torrents (bound to the nordlynx VPN interface)
+      podman-desktop # container GUI (uses the Docker socket)
+      lazydocker # container TUI
       # Spatial / GIS
       qgis # desktop GIS
       gdal # ogr2ogr, gdalinfo, gdal_translate...
@@ -667,6 +669,16 @@ in
     waybar
     wget
 
+    # Super+D launch prefix: move to the lowest-numbered empty workspace,
+    # then start the app there.
+    (writeShellScriptBin "launch-on-empty" ''
+      used=$(swaymsg -t get_workspaces | ${pkgs.jq}/bin/jq '.[].num')
+      n=1
+      while grep -qx "$n" <<<"$used"; do n=$((n + 1)); done
+      swaymsg -q workspace number "$n"
+      exec "$@"
+    '')
+
     # Waybar VPN indicator: prints status JSON; `waybar-vpn toggle`
     # connects/disconnects (signal 8 refreshes the icon straight away).
     (writeShellScriptBin "waybar-vpn" ''
@@ -675,7 +687,7 @@ in
           nordvpn disconnect >/dev/null 2>&1
         else
           ${pkgs.libnotify}/bin/notify-send -t 3000 NordVPN "Connecting…"
-          nordvpn connect >/dev/null 2>&1 || ${pkgs.libnotify}/bin/notify-send NordVPN "Couldn't connect (run: nordvpn login)"
+          nordvpn connect New_Zealand >/dev/null 2>&1 || ${pkgs.libnotify}/bin/notify-send NordVPN "Couldn't connect (run: nordvpn login)"
         fi
         pkill -RTMIN+8 waybar
         exit 0
