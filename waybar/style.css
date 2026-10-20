@@ -51,19 +51,25 @@ window#waybar {
   font-weight: bold;
 }
 
+/* Status modules: compact */
 #pulseaudio,
+#custom-vpn,
 #network,
 #power-profiles-daemon,
 #temperature,
 #battery,
 #tray {
-  padding: 0 10px;
+  font-size: 12px;
+  padding: 0 5px;
 }
+#tray { padding-right: 8px; }
 
 #pulseaudio.muted { color: #8a90a6; }
 #battery.warning:not(.charging)  { color: #e0af68; }
 #battery.critical:not(.charging) { color: #f7768e; }
 #network.disconnected { color: #f7768e; }
+#custom-vpn.connected { color: #9ece6a; }
+#custom-vpn.disconnected { color: #565f89; }
 
 #power-profiles-daemon.performance { color: #f7768e; }
 #power-profiles-daemon.balanced    { color: #7aa2f7; }

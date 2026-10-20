@@ -30,6 +30,26 @@ let
   pycharmProjects = lib.concatLists [
     (pycharmProject "amischatter" "AMISChatter" "/home/jwm/Source/AMISChatter")
   ];
+
+  # Games live in their own menu ("Games" in Super+D, or Super+Shift+G)
+  # rather than the main launcher list. Add a line here per new game:
+  # desktop-file id, label, icon, package holding the .desktop file.
+  games = [
+    { id = "org.gnome.Mines"; name = "Mines"; icon = "org.gnome.Mines"; pkg = pkgs.gnome-mines; }
+    { id = "org.gnome.Sudoku"; name = "Sudoku"; icon = "org.gnome.Sudoku"; pkg = pkgs.gnome-sudoku; }
+    { id = "shattered-pixel-dungeon"; name = "Shattered Pixel Dungeon"; icon = "shattered-pixel-dungeon"; pkg = pkgs.shattered-pixel-dungeon; }
+    { id = "unciv"; name = "Unciv"; icon = "unciv"; pkg = pkgs.unciv; }
+    { id = "org.wesnoth.Wesnoth"; name = "Battle for Wesnoth"; icon = "wesnoth-icon"; pkg = pkgs.wesnoth; }
+    { id = "openttd"; name = "OpenTTD"; icon = "openttd"; pkg = pkgs.openttd; }
+    { id = "steam"; name = "Steam"; icon = "steam"; pkg = pkgs.steam-unwrapped; }
+  ];
+  gamesMenu = pkgs.writeShellScriptBin "games-menu" ''
+    ids=(${lib.concatMapStringsSep " " (g: g.id) games})
+    i=$(printf '%s\0icon\x1f%s\n' \
+      ${lib.concatMapStringsSep " " (g: "${lib.escapeShellArg g.name} ${lib.escapeShellArg g.icon}") games} \
+      | ${pkgs.fuzzel}/bin/fuzzel --dmenu --index --prompt 'games> ') || exit 0
+    exec ${pkgs.gtk3}/bin/gtk-launch "''${ids[$i]}"
+  '';
 in
 {
   imports =
@@ -58,6 +78,20 @@ in
 
   # Enable networking
   networking.networkmanager.enable = true;
+  # DNS: Cloudflare, with Google as fallback, encrypted (DNS-over-TLS) when the
+  # server supports it. "~." makes these win over the router's DHCP DNS.
+  services.resolved.enable = true;
+  services.resolved.settings.Resolve = {
+    DNS = [
+      "1.1.1.1#cloudflare-dns.com"
+      "1.0.0.1#cloudflare-dns.com"
+      "2606:4700:4700::1111#cloudflare-dns.com"
+      "2606:4700:4700::1001#cloudflare-dns.com"
+    ];
+    FallbackDNS = [ "8.8.8.8#dns.google" "8.8.4.4#dns.google" ];
+    Domains = [ "~." ];
+    DNSOverTLS = "opportunistic";
+  };
   # Tray icon (waybar) for switching Wi-Fi and adding networks; the Wi-Fi
   # password is saved in the keyring. Started with the sway session.
   programs.nm-applet.enable = true;
@@ -88,6 +122,11 @@ in
     enableOnBoot = false;
     autoPrune.enable = true; # weekly cleanup of unused images/containers
   };
+
+  # NordVPN (official client + daemon). One-time: `nordvpn login`, then
+  # `nordvpn c` / `nordvpn d`, or the waybar VPN icon / "NordVPN" app.
+  services.nordvpn.enable = true;
+  networking.firewall.checkReversePath = "loose"; # needed for the VPN tunnel
 
   # Set your time zone.
   time.timeZone = "Australia/Adelaide";
@@ -152,7 +191,7 @@ in
   users.users.jwm = {
     isNormalUser = true;
     # description = "JWM";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "nordvpn" ];
     shell = pkgs.zsh;
     # packages = with pkgs; [];
   };
@@ -187,6 +226,7 @@ in
       kdePackages.okular # PDF annotation/forms/signing (zathura is the default viewer)
       jetbrains.idea
       jetbrains.pycharm
+      jetbrains.rust-rover
       libreoffice-fresh
       maestral # open-source Dropbox client (CLI: `maestral status`, etc.)
       maestral-gui
@@ -198,6 +238,22 @@ in
       gcc
       vscode
       vlc # video/audio player
+      qbittorrent # torrents (bound to the nordlynx VPN interface)
+      # Spatial / GIS
+      qgis # desktop GIS
+      gdal # ogr2ogr, gdalinfo, gdal_translate...
+      proj # coordinate transforms (cs2cs, projinfo)
+      tippecanoe # vector tiles from GeoJSON
+      duckdb # SQL on files; `INSTALL spatial; LOAD spatial;`
+      postgresql_17 # psql client (+ shp2pgsql via the Docker image)
+      gamesMenu
+      # Games: casual and strategy
+      gnome-mines
+      gnome-sudoku
+      shattered-pixel-dungeon # roguelike
+      unciv # Civilization V-style 4X
+      wesnoth # turn-based fantasy strategy
+      openttd # transport tycoon
     ];
     programs.bash.enable = true;
     # Login shell: highlights commands as you type (green = valid, red = unknown)
@@ -369,7 +425,14 @@ in
         (rename "dbeaver" pkgs.dbeaver-bin "DBeaver")
         (rename "drawio" pkgs.drawio "draw.io")
         (rename "thunar" pkgs.thunar "Files (Thunar)")
-      ]);
+        (rename "nordvpn-gui" pkgs.nordvpn "NordVPN")
+        # One "Games" entry opens the games menu; the games themselves are
+        # hidden here but still launchable from it.
+        {
+          name = "applications/games-menu.desktop";
+          value.text = "[Desktop Entry]\nType=Application\nName=Games\nIcon=applications-games\nExec=games-menu\nCategories=Game;\n";
+        }
+      ] ++ map (g: hideKeep g.id g.pkg) games);
     # Tokyo Night for all GTK apps (Thunar, pavucontrol, file dialogs, ...),
     # with Papirus icons in matching indigo folders.
     gtk = {
@@ -603,6 +666,29 @@ in
     pavucontrol
     waybar
     wget
+
+    # Waybar VPN indicator: prints status JSON; `waybar-vpn toggle`
+    # connects/disconnects (signal 8 refreshes the icon straight away).
+    (writeShellScriptBin "waybar-vpn" ''
+      if [ "''${1:-}" = toggle ]; then
+        if nordvpn status 2>/dev/null | grep -q 'Status: Connected'; then
+          nordvpn disconnect >/dev/null 2>&1
+        else
+          ${pkgs.libnotify}/bin/notify-send -t 3000 NordVPN "Connecting…"
+          nordvpn connect >/dev/null 2>&1 || ${pkgs.libnotify}/bin/notify-send NordVPN "Couldn't connect (run: nordvpn login)"
+        fi
+        pkill -RTMIN+8 waybar
+        exit 0
+      fi
+      s=$(nordvpn status 2>/dev/null | tr -d '\r')
+      field() { sed -n "s/.*$1: //p" <<<"$s" | head -1; }
+      if grep -q 'Status: Connected' <<<"$s"; then
+        tip="$(field Server)\n$(field City), $(field Country)\n$(field 'Current technology')\nClick: disconnect  Right-click: NordVPN app"
+        printf '{"text":"\uf023","class":"connected","tooltip":"%s"}\n' "$tip"
+      else
+        printf '{"text":"\uf09c","class":"disconnected","tooltip":"NordVPN off\\nClick: connect  Right-click: NordVPN app"}\n'
+      fi
+    '')
 
     # Screenshots: `screenshot area` (drag a box) or `screenshot full`.
     # Saves to ~/Pictures/Screenshots and copies the image to the clipboard.

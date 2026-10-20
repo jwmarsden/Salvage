@@ -1,0 +1,28 @@
+# PostGIS + TimescaleDB (Postgres 17) for local spatial / time-series work.
+#   Start:  docker compose up -d        (from this folder)
+#   Stop:   docker compose down         (data is kept in the geodb-data volume)
+#   psql:   psql -h localhost -U geo geo   (password in .env)
+# Only listens on localhost.
+services:
+  geodb:
+    image: timescale/timescaledb-ha:pg17-ts2.30
+    container_name: geodb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: geo
+      POSTGRES_DB: geo
+      POSTGRES_PASSWORD: ${GEODB_PASSWORD:?set GEODB_PASSWORD in .env}
+    volumes:
+      - geodb-data:/home/postgres/pgdata
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geo -d geo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  geodb-data:

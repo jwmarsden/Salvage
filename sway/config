@@ -89,6 +89,9 @@ output * bg /home/jwm/nix-config/walls/stormlight_02.png fill
     # Git UI (lazygit; opens the recent-repos list when not in a repo)
     bindsym $mod+g exec $term lazygit
 
+    # Games menu
+    bindsym $mod+Shift+g exec games-menu
+
     # Passwords: pick a Bitwarden login in fuzzel, then type or copy it
     bindsym $mod+p exec rofi-rbw --selector fuzzel --typer wtype --clipboarder wl-copy
 
