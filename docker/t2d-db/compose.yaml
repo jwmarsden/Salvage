@@ -1,0 +1,31 @@
+# PostGIS + TimescaleDB (Postgres 16) "gis" database for T2D work.
+#   Start:  docker compose up -d        (from this folder)
+#   Stop:   docker compose down         (data is kept in the timescaledb_ha_data volume)
+#   psql:   psql -h localhost -U postgres gis   (password in .env)
+# Listens on all interfaces so QGIS on the LAN can reach it (salvage.local:5432).
+# Uses the same host port as geodb, so run one or the other.
+services:
+  t2d-db:
+    image: timescale/timescaledb-ha:pg16
+    container_name: t2d-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: gis
+      POSTGRES_PASSWORD: ${T2D_DB_PASSWORD:?set T2D_DB_PASSWORD in .env}
+    volumes:
+      - timescaledb_ha_data:/home/postgres/pgdata/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gis"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  # Created by the original `docker run`; keep using it rather than a new
+  # compose-prefixed volume.
+  timescaledb_ha_data:
+    external: true

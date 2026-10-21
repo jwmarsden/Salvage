@@ -185,6 +185,18 @@ in
     alsa.enable = true;
     pulse.enable = true;
   };
+  # Keep the laptop speakers (priority 1009) as the default output when
+  # docked: USB outputs like the BT600 headset dongle drop below them.
+  # They can still be picked by hand in pavucontrol.
+  services.pipewire.wireplumber.extraConfig."52-prefer-builtin-output" = {
+    "monitor.alsa.rules" = [{
+      matches = [{ "node.name" = "~alsa_output.usb-.*"; }];
+      actions.update-props = {
+        "priority.session" = 900;
+        "priority.driver" = 900;
+      };
+    }];
+  };
 
   # Firmware updates
   services.fwupd.enable = true;
@@ -712,6 +724,43 @@ in
       else
         printf '{"text":"\uf09c","class":"disconnected","tooltip":"NordVPN off\\nClick: connect  Right-click: NordVPN app"}\n'
       fi
+    '')
+
+    # Waybar OneDrive indicator: reads the onedrive@onedrive service log and
+    # prints status JSON (up to date / syncing / error / stopped).
+    (writeShellScriptBin "waybar-onedrive" ''
+      unit=onedrive@onedrive
+      jq=${pkgs.jq}/bin/jq
+      if ! systemctl --user is-active -q "$unit"; then
+        $jq -cn '{text:"󰅤", class:"stopped", tooltip:"OneDrive sync is stopped\nRight-click: start it"}'
+        exit 0
+      fi
+      journalctl --user -u "$unit" -n 80 -o json --no-pager 2>/dev/null |
+      $jq -sc --argjson now "$(date +%s)" '
+        def hm: localtime | strftime("%H:%M");
+        map({t: ((.__REALTIME_TIMESTAMP | tonumber) / 1000000), m: (.MESSAGE | tostring)}) as $l
+        | "Sync with Microsoft OneDrive is complete|No changes or items" as $donere
+        | ($l | map(select(.m | test($donere))) | last) as $done
+        | ($l | map(select(.m | test("ERROR|Unable to|failed"))) | last) as $err
+        | ($l | last) as $latest
+        | ($l | map(select(.m | test("^(Uploading|Downloading|Deleting|Moving)")))
+             | reverse
+             | map((if (.m | startswith("Uploading")) then "↑ "
+                    elif (.m | startswith("Downloading")) then "↓ " else "✕ " end)
+                   + (.m | sub(" \\.\\.\\..*$"; "") | sub(".*/"; "") | sub("^[^:]*: "; "")))
+             | reduce .[] as $f ([]; if index([$f]) then . else . + [$f] end)
+             | .[0:4]) as $files
+        | (if $files == [] then "" else "\n\nRecent:\n" + ($files | join("\n")) end) as $recent
+        | ("\nClick: live log  Right-click: restart sync") as $help
+        | if $err != null and $err.t > ($done.t // 0) then
+            {text: "󰧠", class: "error",
+             tooltip: ("OneDrive error at " + ($err.t | hm) + ":\n" + ($err.m | .[0:120]) + $recent + $help)}
+          elif $latest != null and ($latest.m | test($donere) | not) and ($now - $latest.t) < 20 then
+            {text: "󰘿", class: "syncing", tooltip: ("OneDrive syncing…\n" + ($latest.m | .[0:120]) + $recent + $help)}
+          else
+            {text: "󰅠", class: "idle",
+             tooltip: ("OneDrive up to date" + (if $done then " (checked " + ($done.t | hm) + ")" else "" end) + $recent + $help)}
+          end'
     '')
 
     # Screenshots: `screenshot area` (drag a box) or `screenshot full`.

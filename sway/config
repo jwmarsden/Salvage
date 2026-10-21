@@ -27,9 +27,9 @@ output * bg /home/jwm/nix-config/walls/stormlight_02.png fill
 #
 #   output HDMI-A-1 resolution 1920x1080 position 1920,0
 
-# Dell monitor on the left, laptop screen to its right (tops aligned).
+# Dell monitor on the left, laptop screen to its right (centred vertically).
 output "Dell Inc. DELL UP2716D 64HP778H580L" position 0 0
-output eDP-1 position 2560 0
+output eDP-1 position 2560 360
 #
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 

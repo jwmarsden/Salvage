@@ -14,7 +14,7 @@
     "sway/mode"
   ],
   "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "custom/vpn", "network", "power-profiles-daemon", "temperature", "battery", "tray"],
+  "modules-right": ["pulseaudio", "custom/vpn", "custom/onedrive", "network", "power-profiles-daemon", "temperature", "battery", "tray"],
 
   // App launchers: click to open.
   "custom/thunar": {
@@ -82,6 +82,14 @@
     "signal": 8,
     "on-click": "waybar-vpn toggle",
     "on-click-right": "nordvpn-gui"
+  },
+  // OneDrive sync status from the onedrive@onedrive service log.
+  "custom/onedrive": {
+    "exec": "waybar-onedrive",
+    "return-type": "json",
+    "interval": 5,
+    "on-click": "foot journalctl --user -fu onedrive@onedrive -o cat",
+    "on-click-right": "systemctl --user restart onedrive@onedrive"
   },
   "network": {
     // Icon only (signal strength); the network name is in the tooltip.

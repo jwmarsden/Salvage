@@ -71,6 +71,7 @@ window#waybar {
 /* Status modules: compact */
 #pulseaudio,
 #custom-vpn,
+#custom-onedrive,
 #network,
 #power-profiles-daemon,
 #temperature,
@@ -87,6 +88,10 @@ window#waybar {
 #network.disconnected { color: #f7768e; }
 #custom-vpn.connected { color: #9ece6a; }
 #custom-vpn.disconnected { color: #565f89; }
+#custom-onedrive.idle    { color: #7aa2f7; }
+#custom-onedrive.syncing { color: #7dcfff; }
+#custom-onedrive.error   { color: #f7768e; }
+#custom-onedrive.stopped { color: #565f89; }
 
 #power-profiles-daemon.performance { color: #f7768e; }
 #power-profiles-daemon.balanced    { color: #7aa2f7; }
