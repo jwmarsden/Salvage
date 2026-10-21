@@ -109,6 +109,22 @@ in
   };
   services.blueman.enable = true;
 
+  # mDNS: find printers/devices on the LAN and resolve *.local names;
+  # this machine is reachable as salvage.local.
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true; # UDP 5353
+    publish = {
+      enable = true;
+      addresses = true;
+    };
+  };
+
+  # Printing (CUPS). Network printers like the Brother MFC-L3750CDW are
+  # found via Avahi and use driverless IPP Everywhere, so no drivers needed.
+  services.printing.enable = true;
+
   # Compressed swap in RAM for this 8 GB machine; used before the disk swap.
   zramSwap = {
     enable = true;
@@ -674,16 +690,6 @@ in
     pavucontrol
     waybar
     wget
-
-    # Super+D launch prefix: move to the lowest-numbered empty workspace,
-    # then start the app there.
-    (writeShellScriptBin "launch-on-empty" ''
-      used=$(swaymsg -t get_workspaces | ${pkgs.jq}/bin/jq '.[].num')
-      n=1
-      while grep -qx "$n" <<<"$used"; do n=$((n + 1)); done
-      swaymsg -q workspace number "$n"
-      exec "$@"
-    '')
 
     # Waybar VPN indicator: prints status JSON; `waybar-vpn toggle`
     # connects/disconnects (signal 8 refreshes the icon straight away).
