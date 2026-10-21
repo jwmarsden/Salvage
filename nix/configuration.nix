@@ -97,6 +97,16 @@ in
   programs.nm-applet.enable = true;
 
   programs.sway.enable = true;
+  # Screen sharing (Teams, browsers, OBS) through xdg-desktop-portal-wlr. The
+  # sway module turns this on already; it's spelled out here, with slurp as
+  # the picker: click the screen to share when more than one is connected.
+  xdg.portal.wlr = {
+    enable = true;
+    settings.screencast = {
+      chooser_type = "simple";
+      chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+    };
+  };
 
   # Cooling/power: fanless MacBook, so throttle smartly and allow power-saver mode
   services.thermald.enable = true;
@@ -260,6 +270,7 @@ in
       maestral-gui
       obsidian
       slack
+      teams-for-linux # unofficial Microsoft Teams desktop app (wraps the web app)
       python3
       # Rust: rustup manages rustc/cargo toolchains; gcc provides the linker
       rustup
@@ -326,6 +337,15 @@ in
       settings.main = {
         font-italic = "VictorMono Nerd Font Mono:style=Oblique";
         font-bold-italic = "VictorMono Nerd Font Mono:style=Bold Oblique";
+        # highlighting text copies it to the clipboard (and the primary selection)
+        selection-target = "both";
+      };
+      # Ctrl+V and right-click paste the clipboard. Ctrl+C stays as interrupt
+      # (stopping the running program); highlighting already copies.
+      settings.key-bindings.clipboard-paste = "Control+v Control+Shift+v XF86Paste";
+      settings.mouse-bindings = {
+        clipboard-paste = "BTN_RIGHT";
+        select-extend = "none"; # was right-click; Ctrl+right-click still extends
       };
       settings.colors-dark = {
         alpha = 0.85;
@@ -700,6 +720,8 @@ in
     claude-code
     nano
     pavucontrol
+    smartmontools # smartctl: SSD health (`sudo smartctl -a /dev/nvme0`)
+    efibootmgr # list / tidy the EFI boot entries
     waybar
     wget
 
@@ -833,6 +855,7 @@ in
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
     liberation_ttf
+    open-sans # QGIS MaintenanceMap labels
     fira-code-symbols
     nerd-fonts.symbols-only # prompt icons for oh-my-posh
     # Narrower monospace candidates (try: foot -f "<name>:size=11")
