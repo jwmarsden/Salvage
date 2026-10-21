@@ -160,17 +160,53 @@ in
   # Select internationalisation properties.
   i18n.defaultLocale = "en_AU.UTF-8";
 
-  # Login screen that launches sway.
-  services.greetd = {
+  # Login screen: ReGreet (graphical greetd greeter, run in the cage kiosk
+  # compositor) over the desktop wallpaper, in the same Tokyo Night GTK theme,
+  # Papirus icons and IBM Plex font as the desktop. It remembers the last user
+  # and session (sway). If it ever fails to start, Ctrl+Alt+F2 gives a text
+  # login.
+  services.displayManager.regreet = {
     enable = true;
-    settings.default_session = {
-      # Colours come from the Tokyo Night console palette (boot-splash.nix).
-      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --asterisks"
-        + " --window-padding 2 --container-padding 2"
-        + " --theme 'border=blue;title=blue;greet=cyan;text=white;time=cyan;container=black;prompt=magenta;input=white;action=blue;button=yellow'"
-        + " --cmd sway";
-      user = "greeter";
+    # The laptop panel runs at 2x in sway; cage has no scaling, so ask GTK.
+    package = pkgs.symlinkJoin {
+      name = "regreet-hidpi";
+      inherit (pkgs.regreet) version meta;
+      paths = [ pkgs.regreet ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = "wrapProgram $out/bin/regreet --set GDK_SCALE 2";
     };
+    cageArgs = [ "-s" "-d" "-m" "last" ]; # greeter on the external screen when docked
+    theme = { name = "Tokyonight-Dark"; package = pkgs.tokyonight-gtk-theme; };
+    iconTheme = { name = "Papirus-Dark"; package = pkgs.papirus-icon-theme.override { color = "indigo"; }; };
+    font = { name = "IBM Plex Sans"; size = 13; package = pkgs.ibm-plex; };
+    settings = {
+      # copied into the Nix store, since the greeter user can't read ~/
+      background = { path = ../walls/stormlight_02.png; fit = "Cover"; };
+      GTK.application_prefer_dark_theme = true;
+      appearance.greeting_msg = "Welcome back to salvage";
+      widget.clock = { format = "%A %e %B  ·  %H:%M"; resolution = "1s"; label_width = 320; locale = "en_AU"; };
+    };
+    # Tokyo Night touches over the theme: a translucent panel so the
+    # wallpaper shows through, rounded corners, blue accents.
+    extraCss = ''
+      window { background-color: transparent; }
+      /* the login panel and the clock: one translucent, rounded, blue-edged
+         box (the frame's own border and the grid inside are cleared, which
+         would otherwise draw a second box) */
+      frame.background {
+        background-color: alpha(#1a1b26, 0.78);
+        border-radius: 14px;
+        border: 1px solid alpha(#7aa2f7, 0.45);
+      }
+      frame.background > border { border: none; }
+      grid { background: none; border: none; box-shadow: none; }
+      entry { border-radius: 8px; }
+      button.suggested-action { background: #7aa2f7; color: #1a1b26; box-shadow: none; }
+      button.suggested-action:hover { background: #89a9f9; }
+      button.destructive-action { background: #f7768e; color: #1a1b26; box-shadow: none; }
+      label { color: #c0caf5; }
+      button.suggested-action label, button.destructive-action label { color: #1a1b26; }
+    '';
   };
 
   # Keymap (also picked up by sway's default xkb settings)
