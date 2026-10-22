@@ -59,6 +59,7 @@ in
       ./macbook12-audio.nix
       ./power.nix
       ./boot-splash.nix
+      ./facetimehd-macbook10.nix
     ];
 
   # Bootloader.
@@ -66,7 +67,7 @@ in
   boot.loader.systemd-boot.configurationLimit = 10;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Use latest kernel.
+  # Use latest kernel. (Its webcam driver is patched in facetimehd-macbook10.nix.)
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "salvage"; # Define your hostname.
@@ -307,6 +308,7 @@ in
       obsidian
       slack
       teams-for-linux # unofficial Microsoft Teams desktop app (wraps the web app)
+      snapshot # GNOME camera app: photos and video from the FaceTime HD webcam
       python3
       # Rust: rustup manages rustc/cargo toolchains; gcc provides the linker
       rustup
@@ -587,8 +589,48 @@ in
             };
           };
         };
+        # Thunar right-click custom actions. Managed here, so add or change
+        # them in this file (Thunar's Edit > Configure custom actions can't
+        # save over it). In commands %f is the file or folder, %F all
+        # selected, %d the folder it's in; %% is a literal %.
+        thunarAction = { icon, name, command, patterns ? "*", dirs ? false, files ? false }: ''
+          <action>
+          	<icon>${icon}</icon>
+          	<name>${name}</name>
+          	<submenu></submenu>
+          	<unique-id>salvage-${lib.toLower (lib.replaceStrings [ " " ] [ "-" ] name)}</unique-id>
+          	<command>${command}</command>
+          	<description></description>
+          	<range></range>
+          	<patterns>${patterns}</patterns>
+          	${lib.optionalString dirs "<directories/>"}
+          	${lib.optionalString files "<audio-files/><image-files/><other-files/><text-files/><video-files/>"}
+          </action>
+        '';
       in
-      qtct "qt5ct" // qtct "qt6ct";
+      qtct "qt5ct" // qtct "qt6ct" // {
+        "Thunar/uca.xml" = {
+          force = true;
+          text = ''
+            <?xml version="1.0" encoding="UTF-8"?>
+            <actions>
+          '' + lib.concatMapStrings thunarAction [
+            # also on a folder's empty background, for the folder shown
+            { icon = "utilities-terminal"; name = "Open Terminal Here";
+              command = "foot --working-directory=%f"; dirs = true; }
+            { icon = "vscode"; name = "Open in VS Code";
+              command = "code %F"; dirs = true; files = true; }
+            { icon = "qgis"; name = "Open in QGIS";
+              command = "qgis %f"; files = true;
+              patterns = "*.qgz;*.qgs;*.gpkg;*.shp;*.geojson;*.kml;*.tif;*.tiff"; }
+            { icon = "edit-copy"; name = "Copy Path";
+              command = "sh -c 'printf \"%%s\\n\" \"$@\" | head -c -1 | wl-copy' sh %F";
+              dirs = true; files = true; }
+          ] + ''
+            </actions>
+          '';
+        };
+      };
     # Keyboard-driven PDF viewer (default for PDFs), Tokyo Night colours.
     # Copy selected text to the clipboard, and recolour pages with Ctrl+R.
     programs.zathura = {
@@ -876,6 +918,7 @@ in
     plugins = with pkgs; [
       thunar-volman
       thunar-archive-plugin
+      thunar-vcs-plugin # Git/SVN actions in the right-click menu
     ];
   };
   services.gvfs.enable = true;    # mounting, trash, volman
