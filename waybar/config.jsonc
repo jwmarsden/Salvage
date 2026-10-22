@@ -1,5 +1,7 @@
 // Waybar config for sway on salvage.
 // Reload after editing: Command+Shift+C (reloads sway, which restarts the bar).
+// Every module has "cursor": false, so hovering keeps the normal arrow instead
+// of waybar's hand pointer on clickable modules.
 {
   "layer": "top",
   "position": "top",
@@ -18,27 +20,32 @@
 
   // App launchers: click to open.
   "custom/thunar": {
+    "cursor": false,
     "format": "",
     "tooltip-format": "Files (Thunar)",
     "on-click": "thunar"
   },
   "custom/chrome": {
+    "cursor": false,
     "format": "",
     "tooltip-format": "Google Chrome",
     "on-click": "google-chrome-stable"
   },
   "custom/terminal": {
+    "cursor": false,
     "format": "",
     "tooltip-format": "Terminal",
     "on-click": "alacritty"
   },
   "custom/vscode": {
+    "cursor": false,
     "format": "󰨞",
     "tooltip-format": "VS Code",
     "on-click": "code"
   },
 
   "sway/workspaces": {
+    "cursor": false,
     "disable-scroll": true,
     // Number plus a small icon for each app open on the workspace.
     "format": "{name} <span size='small'>{windows}</span>",
@@ -62,12 +69,14 @@
   },
 
   "clock": {
+    "cursor": false,
     "format": "{:%a %d %b  %H:%M}",
     "tooltip-format": "<tt>{calendar}</tt>"
   },
 
   // Click to open the volume mixer; scroll to change volume.
   "pulseaudio": {
+    "cursor": false,
     "format": "{icon} {volume}%",
     "format-muted": "󰖁",
     "format-icons": { "headphone": "", "default": ["", "", ""] },
@@ -76,6 +85,7 @@
   },
 
   "custom/vpn": {
+    "cursor": false,
     "exec": "waybar-vpn",
     "return-type": "json",
     "interval": 15,
@@ -85,6 +95,7 @@
   },
   // OneDrive sync status from the onedrive@onedrive service log.
   "custom/onedrive": {
+    "cursor": false,
     "exec": "waybar-onedrive",
     "return-type": "json",
     "interval": 5,
@@ -92,6 +103,7 @@
     "on-click-right": "systemctl --user restart onedrive@onedrive"
   },
   "network": {
+    "cursor": false,
     // Icon only (signal strength); the network name is in the tooltip.
     "format-wifi": "{icon}",
     "format-ethernet": "󰈀",
@@ -105,6 +117,7 @@
 
   // Power mode: click to cycle performance / balanced / power-saver.
   "power-profiles-daemon": {
+    "cursor": false,
     "format": "{icon}",
     "tooltip-format": "Power mode: {profile}\nClick to change",
     "format-icons": {
@@ -118,6 +131,7 @@
   // CPU package temperature (fanless: it throttles itself at 100°C).
   // Turns red from 90°C; click for btop.
   "temperature": {
+    "cursor": false,
     "hwmon-path-abs": "/sys/devices/platform/coretemp.0/hwmon",
     "input-filename": "temp1_input",
     "critical-threshold": 90,
@@ -128,6 +142,7 @@
   },
 
   "battery": {
+    "cursor": false,
     "states": { "warning": 25, "critical": 10 },
     "format": "{icon} {capacity}%",
     "format-charging": " {capacity}%",
@@ -136,6 +151,7 @@
   },
 
   "tray": {
+    "cursor": false,
     "spacing": 6
   }
 }
