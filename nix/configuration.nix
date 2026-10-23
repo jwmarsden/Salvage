@@ -474,6 +474,20 @@ in
       enable = true;
       settings.git_protocol = "https";
     };
+    # ODA Viewer (Open Design Alliance; DWG, DGN, IFC ...), an AppImage kept
+    # in ~/Applications, not in the Nix store. Launcher entry, and the
+    # viewer for .ifc files (IFC has no standard file type, so it gets one
+    # in xdg.dataFile below: application/x-ifc). Runs under XWayland: the AppImage has no
+    # Qt Wayland plugin.
+    xdg.desktopEntries.oda-viewer = {
+      name = "ODA Viewer";
+      comment = "View DWG, DGN and IFC models";
+      exec = "env QT_QPA_PLATFORM=xcb appimage-run /home/jwm/Applications/ODAViewer.AppImage %f";
+      icon = "/home/jwm/Applications/ODAViewer.png";
+      categories = [ "Graphics" "Viewer" ];
+      mimeType = [ "application/x-ifc" ];
+    };
+
     # Launcher (Super+D) tidy-up: entries in ~/.local/share/applications
     # override the installed ones with the same file name. Apps stay
     # installed; this only changes what fuzzel lists and what it's called.
@@ -520,6 +534,21 @@ in
         (rename "drawio" pkgs.drawio "draw.io")
         (rename "thunar" pkgs.thunar "Files (Thunar)")
         (rename "nordvpn-gui" pkgs.nordvpn "NordVPN")
+        # IFC files' type, for ODA Viewer (above)
+        {
+          name = "mime/packages/ifc.xml";
+          value.text = ''
+            <?xml version="1.0" encoding="UTF-8"?>
+            <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+              <mime-type type="application/x-ifc">
+                <comment>IFC building model</comment>
+                <!-- above model/step, which also matches *.ifc -->
+                <glob pattern="*.ifc" weight="60"/>
+                <glob pattern="*.IFC" weight="60"/>
+              </mime-type>
+            </mime-info>
+          '';
+        }
         # One "Games" entry opens the games menu; the games themselves are
         # hidden here but still launchable from it.
         {
@@ -905,6 +934,13 @@ in
 
   # Steam (also enables 32-bit graphics libraries for games).
   programs.steam.enable = true;
+
+  # AppImages (e.g. ODA Viewer in ~/Applications): run with appimage-run,
+  # or directly / by double-click (binfmt).
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
 
   programs.neovim = {
     enable = true;
