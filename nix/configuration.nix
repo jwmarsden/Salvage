@@ -302,13 +302,15 @@ in
       jetbrains.idea
       jetbrains.pycharm
       jetbrains.rust-rover
-      libreoffice-fresh
+      libreoffice
       maestral # open-source Dropbox client (CLI: `maestral status`, etc.)
       maestral-gui
       obsidian
       slack
       teams-for-linux # unofficial Microsoft Teams desktop app (wraps the web app)
       snapshot # GNOME camera app: photos and video from the FaceTime HD webcam
+      thunderbird # email (Gmail, Office 365), calendar and contacts
+      gimp # image editor
       python3
       # Rust: rustup manages rustc/cargo toolchains; gcc provides the linker
       rustup
@@ -458,6 +460,7 @@ in
     programs.yazi = {
       enable = true;
       enableZshIntegration = true;
+      shellWrapperName = "yy"; # `yy` opens yazi and cds to where you quit it
       settings.mgr.sort_dir_first = true;
       # Tokyo Night colours, matching foot/alacritty/waybar/fuzzel.
       flavors.tokyo-night = pkgs.fetchFromGitHub {
@@ -523,8 +526,8 @@ in
         "qt5ct" "qt6ct" # Qt theme settings (managed here)
       ] ++ [
         (hideKeep "nvim" config.programs.neovim.finalPackage)
-        (hideKeep "base" pkgs.libreoffice-fresh)
-        (hideKeep "math" pkgs.libreoffice-fresh)
+        (hideKeep "base" pkgs.libreoffice)
+        (hideKeep "math" pkgs.libreoffice)
         # Still open files/folders, just not listed (Super+Y runs yazi;
         # archives open from Thunar).
         (hideKeep "yazi" pkgs.yazi)
@@ -561,6 +564,11 @@ in
     gtk = {
       enable = true;
       theme = {
+        name = "Tokyonight-Dark";
+        package = pkgs.tokyonight-gtk-theme;
+      };
+      # GTK4 / libadwaita apps get the same theme
+      gtk4.theme = {
         name = "Tokyonight-Dark";
         package = pkgs.tokyonight-gtk-theme;
       };
