@@ -1,5 +1,9 @@
 # salvage: Config Notes
 
+> **Superseded:** these are the original change notes from 2026-10-18. The current
+> state of the machine is in [README.md](README.md). In particular, sleep is no longer
+> disabled: see [macbook-suspend-fix.md](macbook-suspend-fix.md).
+
 Notes on how **salvage** is set up and why. Add a new section for each change.
 
 ## The machine
