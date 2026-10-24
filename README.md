@@ -77,6 +77,8 @@ The short version:
 | [`walls/`](walls/) | Wallpapers: `stormlight_02.png` for the desktop and the login screen |
 | [`docker/t2d-db/`](docker/t2d-db/) | PostGIS + TimescaleDB (Postgres 16) `gis` database for T2D work |
 | [`docker/geodb/`](docker/geodb/) | PostGIS + TimescaleDB (Postgres 17) `geo` database for general spatial work |
+| [`docker/redis/`](docker/redis/) | Redis 8 for local development (localhost:6379) |
+| [`docker/cata/`](docker/cata/) | cata.co development: Postgres 17 + PostGIS (localhost:5433) and Redis 8 (localhost:6380) |
 | [`shells/python-shell.nix`](shells/python-shell.nix) | `nix-shell` with Jupyter, pandas, geopandas, shapely, pyproj, matplotlib |
 | [`link-configuration.sh`](link-configuration.sh) | Creates the symlinks below on a fresh install |
 | [`salvage-config.md`](salvage-config.md) | Older change notes (2026-10-18); this README supersedes them |
@@ -156,6 +158,7 @@ monospace.
 | Super+Shift+S / Super+Shift+A | Screenshot an area / the whole screen (saved to `~/Pictures/Screenshots`, copied to the clipboard) |
 | Super+Q or Super+Shift+Q, middle-click a title bar | Close window |
 | Super+Escape | Lock |
+| Power button (short press) | Power menu: Cancel, Lock, Suspend, Restart, Shut down. Holding the button still forces the machine off. |
 | Super+F | Fullscreen |
 | Super+Shift+Space | Toggle floating |
 | Super+R | Resize mode |
@@ -191,6 +194,7 @@ monospace.
 
 **Engineering and GIS**
 - **QGIS**, GDAL, PROJ, tippecanoe, DuckDB (spatial), `psql` 17, DBeaver.
+- **Redis:** Tiny RDM (desktop client) and iredis (a friendlier `redis-cli`).
 - **ODA Viewer**: DWG, DGN and IFC files. It's an AppImage in `~/Applications`
   run through `appimage-run` under XWayland, and the viewer for `.ifc` files,
   via a custom `application/x-ifc` file type.
@@ -201,7 +205,8 @@ monospace.
 - **PyCharm projects:** `pycharm-amischatter` opens AMISChatter inside its
   `nix develop` shell, so compiled pip wheels work. Add more in
   `pycharmProjects` in `configuration.nix`.
-- **Languages:** Python 3, Rust (`rustup`, with `gcc` as the linker), Java.
+- **Languages:** Python 3, Node.js LTS (with npm and npx), Rust (`rustup`, with `gcc` as the linker), Java.
+  `npm install -g` puts packages in `~/.npm-global`, which is on `PATH`, because the Nix store is read-only.
 - **Git:** git with LFS, `gh`, and lazygit. GitHub sign-in is `gh auth login`,
   stored in the keyring; `gh` is git's credential helper for github.com.
 - **direnv + nix-direnv:** a `.envrc` with `use nix` / `use flake` loads a
@@ -234,12 +239,14 @@ Pixel Dungeon, Unciv, Battle for Wesnoth, OpenTTD, Steam.
 
 ### Databases (Docker)
 
-Both stacks use the same host port (5432), so run one at a time. Neither starts
-at boot: start them when you need them.
+The two Postgres stacks use the same host port (5432), so run one at a time.
+None of the stacks start at boot: start them when you need them.
 
 ```sh
 cd ~/nix-config/docker/t2d-db && docker compose up -d   # gis database (T2D)
 cd ~/nix-config/docker/geodb  && docker compose up -d   # geo database
+cd ~/nix-config/docker/redis  && docker compose up -d   # Redis
+cd ~/nix-config/docker/cata   && docker compose up -d   # cata.co Postgres + Redis
 docker compose down                                      # stop (data is kept)
 ```
 
@@ -247,6 +254,14 @@ docker compose down                                      # stop (data is kept)
   at `salvage.local:5432`. Its data lives in the external volume
   `timescaledb_ha_data`.
 - **geodb** (`geo`) listens on localhost only.
+- **redis** listens on `localhost:6379` only, with no password. It keeps its
+  data in the `redis-data` volume, with an append-only file. For a prompt, run
+  `docker exec -it redis redis-cli`.
+- **cata** (for `~/Source/cata.co`) runs `cata-db` (Postgres 17 + PostGIS, user
+  and database `cata`) on `localhost:5433` and `cata-redis` on
+  `localhost:6380`, so it can run alongside the others. The app's connection
+  strings are in `~/Source/cata.co/.env`. Apply the schema with
+  `npm run db:migrate` there.
 - Passwords are in each folder's `.env`, which is git-ignored. Never commit
   them.
 
@@ -259,8 +274,8 @@ hand:
 |---|---|
 | Hardware scan | `/etc/nixos/hardware-configuration.nix` |
 | ODA Viewer AppImage and icon; Kindle and Audible icons | `~/Applications/` |
-| Database passwords | `docker/*/.env` |
-| Database data | Docker volumes `timescaledb_ha_data`, `geodb-data` |
+| Database passwords | `docker/*/.env`; cata.co's app config in `~/Source/cata.co/.env` |
+| Database data | Docker volumes `timescaledb_ha_data`, `geodb-data`, `redis-data`, `cata-db-data`, `cata-redis-data` |
 | EFI variables | `StartupMute`, `SystemAudioVolume`, `SystemAudioVolumeDB`, `Boot0080`; see [macbook-boot-fix.md](macbook-boot-fix.md) |
 | Sign-ins | `gh auth login`, `nordvpn login`, `onedrive`, Maestral, `rbw login`, Chrome sync, Libation |
 | tkMOO worlds and settings | `~/.tkMOO-lite` |

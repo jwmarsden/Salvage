@@ -1,0 +1,24 @@
+# Redis 8 for local development.
+#   Start:  docker compose up -d        (from this folder)
+#   Stop:   docker compose down         (data is kept in the redis-data volume)
+#   CLI:    docker exec -it redis redis-cli
+# Only listens on localhost, so it has no password. Saves to disk with an
+# append-only file, so data survives restarts.
+services:
+  redis:
+    image: redis:8-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis-data:

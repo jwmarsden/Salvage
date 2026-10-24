@@ -99,6 +99,9 @@ output eDP-1 position 2560 360
     # Passwords: pick a Bitwarden login in fuzzel, then type or copy it
     bindsym $mod+p exec rofi-rbw --selector fuzzel --typer wtype --clipboarder wl-copy
 
+    # Power button: ask first (Cancel / Lock / Suspend / Restart / Shut down)
+    bindsym XF86PowerOff exec power-menu
+
     # Lock the screen now (swayidle runs swaylock)
     bindsym $mod+Escape exec loginctl lock-session
 
@@ -267,7 +270,7 @@ bindsym $mod+r mode "resize"
     bindsym --locked XF86KbdBrightnessDown exec brightnessctl --device='spi::kbd_backlight' set 10%-
     bindsym --locked XF86KbdBrightnessUp exec brightnessctl --device='spi::kbd_backlight' set 10%+
 
-    # Lid closed on the charger (no shutdown then, see power.nix): lock
+    # Lid closed: lock (it also suspends, unless docked; see power.nix)
     bindswitch --reload --locked lid:on exec loginctl lock-session
 
     # Special key to take a screenshot with grim

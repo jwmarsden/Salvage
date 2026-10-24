@@ -44,6 +44,10 @@
     HandleLidSwitchExternalPower = "suspend";
     HandleLidSwitchDocked = "ignore";
 
+    # A short press of the power button is easy to hit by accident: ignore
+    # it here and let sway ask first (power-menu). Holding it still forces
+    # the machine off (firmware).
+    HandlePowerKey = "ignore";
     HandleSuspendKey = "suspend";
     HandleHibernateKey = "ignore";
   };

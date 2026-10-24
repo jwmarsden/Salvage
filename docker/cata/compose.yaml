@@ -1,0 +1,46 @@
+# cata.co local development: Postgres 17 + PostGIS, and Redis 8 (sessions).
+#   Start:  docker compose up -d        (from this folder)
+#   Stop:   docker compose down         (data is kept in the cata-* volumes)
+#   psql:   docker exec -it cata-db psql -U cata cata
+#   Redis:  docker exec -it cata-redis redis-cli
+# Own ports (5433, 6380), so it runs alongside t2d-db / geodb and redis.
+# Localhost only. The Postgres password is in .env (git-ignored); the app's
+# connection strings are in ~/Source/cata.co/.env.
+services:
+  cata-db:
+    image: postgis/postgis:17-3.5
+    container_name: cata-db
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      POSTGRES_USER: cata
+      POSTGRES_DB: cata
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - cata-db-data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cata -d cata"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cata-redis:
+    image: redis:8-alpine
+    container_name: cata-redis
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6380:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - cata-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  cata-db-data:
+  cata-redis-data:

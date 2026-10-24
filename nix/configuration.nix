@@ -33,7 +33,8 @@ let
 
   # Games live in their own menu ("Games" in Super+D, or Super+Shift+G)
   # rather than the main launcher list. Add a line here per new game:
-  # desktop-file id, label, icon, package holding the .desktop file.
+  # desktop-file id, label, icon, package holding the .desktop file;
+  # `main = true` also keeps it in the main list.
   games = [
     { id = "org.gnome.Mines"; name = "Mines"; icon = "org.gnome.Mines"; pkg = pkgs.gnome-mines; }
     { id = "org.gnome.Sudoku"; name = "Sudoku"; icon = "org.gnome.Sudoku"; pkg = pkgs.gnome-sudoku; }
@@ -41,7 +42,7 @@ let
     { id = "unciv"; name = "Unciv"; icon = "unciv"; pkg = pkgs.unciv; }
     { id = "org.wesnoth.Wesnoth"; name = "Battle for Wesnoth"; icon = "wesnoth-icon"; pkg = pkgs.wesnoth; }
     { id = "openttd"; name = "OpenTTD"; icon = "openttd"; pkg = pkgs.openttd; }
-    { id = "steam"; name = "Steam"; icon = "steam"; pkg = pkgs.steam-unwrapped; }
+    { id = "steam"; name = "Steam"; icon = "steam"; pkg = pkgs.steam-unwrapped; main = true; }
   ];
   gamesMenu = pkgs.writeShellScriptBin "games-menu" ''
     ids=(${lib.concatMapStringsSep " " (g: g.id) games})
@@ -285,6 +286,8 @@ in
     home.packages = with pkgs; [
       bat
       dbeaver-bin # database client (Community Edition)
+      tiny-rdm # Redis desktop client (cata.co: localhost:6380, redis: localhost:6379)
+      iredis # Redis CLI with completion and highlighting (`iredis -p 6380`)
       # Bitwarden: desktop app, plus rbw + rofi-rbw for Super+P (fuzzel
       # picker that types/copies logins into any app). One-time setup:
       # `rbw config set email <you>` then `rbw login`.
@@ -314,6 +317,7 @@ in
       libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
       python3
+      nodejs # Node.js LTS, with npm and npx
       # Rust: rustup manages rustc/cargo toolchains; gcc provides the linker
       rustup
       gcc
@@ -338,6 +342,10 @@ in
       wesnoth # turn-based fantasy strategy
       openttd # transport tycoon
     ];
+    # `npm install -g` can't write to the Nix store; put global packages in
+    # ~/.npm-global and their commands on PATH.
+    home.file.".npmrc".text = "prefix=/home/jwm/.npm-global\n";
+    home.sessionPath = [ "$HOME/.npm-global/bin" ];
     programs.bash.enable = true;
     # Login shell: highlights commands as you type (green = valid, red = unknown)
     # and suggests from history in grey (press → to accept).
@@ -578,7 +586,7 @@ in
           name = "applications/games-menu.desktop";
           value.text = "[Desktop Entry]\nType=Application\nName=Games\nIcon=applications-games\nExec=games-menu\nCategories=Game;\n";
         }
-      ] ++ map (g: hideKeep g.id g.pkg) games);
+      ] ++ map (g: hideKeep g.id g.pkg) (lib.filter (g: !(g.main or false)) games));
     # Tokyo Night for all GTK apps (Thunar, pavucontrol, file dialogs, ...),
     # with Papirus icons in matching indigo folders.
     gtk = {
@@ -938,6 +946,20 @@ in
       esac
       wl-copy --type image/png < "$file"
       echo "$file"
+    '')
+
+    # Power button menu (power.nix makes logind ignore a short press; sway
+    # runs this instead). "Cancel" is first, so Enter or Esc on an
+    # accidental press does nothing. Holding the button still forces off.
+    (writeShellScriptBin "power-menu" ''
+      choice=$(printf '%s\n' "Cancel" "Lock" "Suspend" "Restart" "Shut down" |
+        ${pkgs.fuzzel}/bin/fuzzel --dmenu --prompt 'power> ' --lines 5 --width 20) || exit 0
+      case "$choice" in
+        Lock) loginctl lock-session ;;
+        Suspend) systemctl suspend ;;
+        Restart) systemctl reboot ;;
+        "Shut down") systemctl poweroff ;;
+      esac
     '')
   ] ++ pycharmProjects;
 

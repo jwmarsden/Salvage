@@ -41,6 +41,8 @@ drain turns out to be too high, add suspend-then-shutdown after a few hours.
 | Lid closed (battery or charger) | Suspend. The screen locks first (swayidle `before-sleep`). |
 | Lid closed with an external display (docked) | Keeps running |
 | Suspend key | Suspend |
+| Power button, short press | Asks first: `power-menu` (fuzzel) with Cancel first. logind ignores the press (`HandlePowerKey = "ignore"`) and Sway binds `XF86PowerOff`. Nothing happens on the lock or login screen. |
+| Power button, held | The firmware forces the machine off |
 | Wake | Open the lid, or press a key / click the trackpad with the lid open. Tap the power button, don't hold it. |
 | Hibernate | Off: there's no `resume=` device |
 
