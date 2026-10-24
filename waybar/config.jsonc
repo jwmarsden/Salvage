@@ -81,6 +81,7 @@
     "format-muted": "󰖁",
     "format-icons": { "headphone": "", "default": ["", "", ""] },
     "on-click": "pavucontrol",
+    "max-volume": 100,
     "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
   },
 

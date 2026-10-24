@@ -1,24 +1,50 @@
-# Sleep is disabled entirely: this MacBook10,1 freezes on suspend/resume and
-# needs a hard power-off to recover. Hibernation was never configured either.
-{ ... }:
+# Suspend (s2idle) on this MacBook10,1. It used to freeze on resume and need
+# a hard power-off; tested working on 2026-10-24 (kernel 7.3) with the two
+# fixes below. The camera driver is unloaded and reloaded around sleep by
+# hardware.facetimehd (facetimehd-macbook10.nix). Hibernation was never
+# configured (no resume= device), so it stays off.
+{ pkgs, ... }:
 
 {
-  # Refuse every sleep mode, whatever requests it (lid, keys, apps, systemctl).
   systemd.sleep.settings.Sleep = {
-    AllowSuspend = "no";
+    AllowSuspend = "yes";
     AllowHibernation = "no";
     AllowHybridSleep = "no";
     AllowSuspendThenHibernate = "no";
   };
 
+  # Sleep with s2idle, not deep S3: after S3 the speakers stay silent (the
+  # amps seem to be set up only by the firmware at power-on, which S3 resume
+  # skips; rebinding the HDA driver doesn't bring them back).
+  boot.kernelParams = [ "mem_sleep_default=s2idle" ];
+
+  # The Apple NVMe controller (106b:2003) doesn't come back from D3cold, which
+  # hung resume; keep it in D3hot.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x106b", ATTR{device}=="0x2003", ATTR{d3cold_allowed}="0"
+  '';
+
+  # The USB controller (XHC1) can wake the machine straight back up; leave the
+  # lid, keyboard and trackpad as wake sources. /proc/acpi/wakeup toggles, so
+  # only write it while XHC1 is enabled.
+  systemd.services.disable-xhc1-wakeup = {
+    description = "Stop the USB controller waking the machine from sleep";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      if ${pkgs.gnugrep}/bin/grep -q '^XHC1.*enabled' /proc/acpi/wakeup; then
+        echo XHC1 > /proc/acpi/wakeup
+      fi
+    '';
+  };
+
   services.logind.settings.Login = {
-    # Lid closed: shut down on battery, stay on when on the charger or docked.
-    HandleLidSwitch = "poweroff";
-    HandleLidSwitchExternalPower = "ignore";
+    # Lid closed: suspend, on battery or the charger; stay on when docked.
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "suspend";
     HandleLidSwitchDocked = "ignore";
 
-    # Sleep / hibernate keys do nothing.
-    HandleSuspendKey = "ignore";
+    HandleSuspendKey = "suspend";
     HandleHibernateKey = "ignore";
   };
 }

@@ -311,6 +311,7 @@ in
       snapshot # GNOME camera app: photos and video from the FaceTime HD webcam
       thunderbird # email (Gmail, Office 365), calendar and contacts
       gimp # image editor
+      (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
       python3
       # Rust: rustup manages rustc/cargo toolchains; gcc provides the linker
       rustup
@@ -782,8 +783,8 @@ in
     };
 
     # Lock after 5 min idle, screen off after 10 min. Super+Escape (or
-    # `loginctl lock-session`) locks straight away. There's no suspend on
-    # this machine (power.nix), so there's no before-sleep hook.
+    # `loginctl lock-session`) locks straight away. The screen also locks
+    # before suspend (lid close, power.nix), so it's locked on waking.
     services.swayidle =
       let
         lock = "${pkgs.swaylock-effects}/bin/swaylock -f";
@@ -799,6 +800,7 @@ in
           }
         ];
         events.lock = lock;
+        events.before-sleep = lock;
       };
 
     # Clipboard history; Super+Shift+V picks an earlier entry.

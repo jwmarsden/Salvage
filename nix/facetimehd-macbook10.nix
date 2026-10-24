@@ -76,7 +76,8 @@
           carve 1705840   18656 1571_01XX.dat
           carve 1724496   18672 1575_01XX.dat
 
-          strings firmware.bin | grep -q 'S2ISP-01.55.00'
+          # grep -c reads to the end: grep -q would stop early and SIGPIPE strings
+          strings firmware.bin | grep -c 'S2ISP-01.55.00' >/dev/null
           # each calibration file starts with its sensor number, e.g. 16 75
           [ "$(head -c 2 1675_01XX.dat | od -A n -t x1 | tr -d ' ')" = 1675 ]
           runHook postBuild
