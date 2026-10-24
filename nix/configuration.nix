@@ -311,6 +311,7 @@ in
       snapshot # GNOME camera app: photos and video from the FaceTime HD webcam
       thunderbird # email (Gmail, Office 365), calendar and contacts
       gimp # image editor
+      libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
       python3
       # Rust: rustup manages rustc/cargo toolchains; gcc provides the linker
@@ -490,6 +491,24 @@ in
       icon = "/home/jwm/Applications/ODAViewer.png";
       categories = [ "Graphics" "Viewer" ];
       mimeType = [ "application/x-ifc" ];
+    };
+
+    # Kindle and Audible have no Linux apps; open their web reader / player
+    # as Chrome app windows (no tabs or address bar), signed in with the
+    # normal Chrome profile.
+    xdg.desktopEntries.kindle = {
+      name = "Kindle";
+      comment = "Read Kindle books (Kindle Cloud Reader)";
+      exec = "google-chrome-stable --app=https://read.amazon.com/";
+      icon = "/home/jwm/Applications/kindle.png";
+      categories = [ "Office" "Viewer" ];
+    };
+    xdg.desktopEntries.audible = {
+      name = "Audible";
+      comment = "Listen to Audible audiobooks (web player)";
+      exec = "google-chrome-stable --app=https://www.audible.com.au/library/titles";
+      icon = "/home/jwm/Applications/audible.png";
+      categories = [ "AudioVideo" "Audio" "Player" ];
     };
 
     # Launcher (Super+D) tidy-up: entries in ~/.local/share/applications
