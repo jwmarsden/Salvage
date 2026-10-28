@@ -77,9 +77,11 @@ output eDP-1 position 2560 360
     # Middle-click a window's title bar to close it
     bindsym --release button2 kill
 
-    # Screenshots (saved to ~/Pictures/Screenshots and copied to the clipboard)
-    bindsym $mod+Shift+s exec screenshot area
+    # Screenshots: drag a box and annotate it in Satty (then copy or save to
+    # ~/Pictures/Screenshots); the whole screen is saved and copied
+    bindsym $mod+Shift+s exec screenshot annotate
     bindsym $mod+Shift+a exec screenshot full
+    for_window [app_id="com.gabm.satty"] floating enable
 
     # Start your launcher
     bindsym $mod+d exec $menu

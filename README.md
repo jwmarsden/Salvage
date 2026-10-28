@@ -101,8 +101,9 @@ The short version:
 ## Everyday use
 
 ```sh
-sudo nixos-rebuild switch        # apply changes
-sudo nixos-rebuild switch --upgrade   # update the channel and apply
+nh os switch                     # apply changes (shows progress and a package diff)
+sudo nix-channel --update && nh os switch   # update the channel and apply
+sudo nixos-rebuild switch        # the same without nh
 sudo systemctl reload systemd-logind  # after changing services.logind.settings
 ```
 
@@ -155,7 +156,8 @@ monospace.
 | Super+G | lazygit |
 | Super+P | Bitwarden picker (rbw): types or copies a login |
 | Super+Shift+V | Clipboard history |
-| Super+Shift+S / Super+Shift+A | Screenshot an area / the whole screen (saved to `~/Pictures/Screenshots`, copied to the clipboard) |
+| Super+Shift+S | Drag a box and annotate it in Satty, then copy (Ctrl+C) or save (Ctrl+S, to `~/Pictures/Screenshots`) |
+| Super+Shift+A | Screenshot the whole screen (saved to `~/Pictures/Screenshots`, copied to the clipboard) |
 | Super+Q or Super+Shift+Q, middle-click a title bar | Close window |
 | Super+Escape | Lock |
 | Power button (short press) | Power menu: Cancel, Lock, Suspend, Restart, Shut down. Holding the button still forces the machine off. |

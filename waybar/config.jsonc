@@ -64,7 +64,13 @@
       "class<.*qbittorrent.*>": "",
       "class<.*podman.*>": "",
       "class<.*pavucontrol.*>": "",
-      "class<.*steam.*>": ""
+      "class<.*steam.*>": "",
+      "class<DBeaver>": "󰆼",
+      "class<Tkmoo>": "󰆚",
+      "class<jetbrains-pycharm>": "",
+      // Nerd Fonts has no crab, so use the one-colour Noto Emoji one
+      // (U+FE0E asks for the text-style glyph, not the colour emoji)
+      "class<jetbrains-rustrover>": "<span font='Noto Emoji'>🦀\ufe0e</span>"
     }
   },
 

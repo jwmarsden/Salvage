@@ -263,6 +263,13 @@ in
     options = "--delete-older-than 14d";
   };
 
+  # nh: `nh os switch` rebuilds with live progress and a diff of what changed
+  # (also `nh os boot`, `nh search <name>`). This isn't a flake, so NH_FILE
+  # points it at the usual nixos-config from NIX_PATH. Its cleaner stays off:
+  # nix.gc above already does that job.
+  programs.nh.enable = true;
+  environment.sessionVariables.NH_FILE = "<nixpkgs/nixos>";
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.jwm = {
     isNormalUser = true;
@@ -285,6 +292,9 @@ in
     home.stateVersion = "25.11";
     home.packages = with pkgs; [
       bat
+      ripgrep # rg: fast recursive grep
+      fd # fast, friendly find
+      jq # JSON on the command line
       dbeaver-bin # database client (Community Edition)
       tiny-rdm # Redis desktop client (cata.co: localhost:6380, redis: localhost:6379)
       iredis # Redis CLI with completion and highlighting (`iredis -p 6380`)
@@ -296,6 +306,8 @@ in
       rofi-rbw-wayland
       pinentry-gnome3 # master-password prompt for rbw
       drawio # draw.io diagram editor
+      blender # 3D modelling; inspect and repair meshes for cata.co scenes
+      f3d # fast 3D model viewer (`f3d model.obj`)
       flameshot
       fuzzel
       git-lfs
@@ -304,6 +316,7 @@ in
       kdePackages.okular # PDF annotation/forms/signing (zathura is the default viewer)
       jetbrains.idea
       jetbrains.pycharm
+      jetbrains.rider # .NET IDE (uses dotnet-sdk_10 from the PATH)
       jetbrains.rust-rover
       libreoffice
       maestral # open-source Dropbox client (CLI: `maestral status`, etc.)
@@ -318,6 +331,7 @@ in
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
       python3
       nodejs # Node.js LTS, with npm and npx
+      dotnet-sdk_10 # .NET 10 SDK and runtime (`dotnet`); LTS, supported to Nov 2028
       # Rust: rustup manages rustc/cargo toolchains; gcc provides the linker
       rustup
       gcc
@@ -355,6 +369,11 @@ in
       syntaxHighlighting.enable = true;
       autosuggestion.enable = true;
       historySubstringSearch.enable = true; # ↑/↓ search history for what's typed
+      # Also set here (not only system-wide) so new terminals pick it up
+      # without logging out of sway first.
+      envExtra = ''
+        export NH_FILE="<nixpkgs/nixos>"
+      '';
       history = {
         size = 50000;
         save = 50000;
@@ -741,6 +760,13 @@ in
       nix-direnv.enable = true;
     };
 
+    # Fuzzy finder: Ctrl+R searches history, Ctrl+T picks a file,
+    # Alt+C cds into a directory.
+    programs.fzf.enable = true;
+    # `z <part of a path>` jumps to a directory you've visited before;
+    # `zi` picks one with fzf.
+    programs.zoxide.enable = true;
+
     # Image viewer (default for images in Thunar).
     programs.imv = {
       enable = true;
@@ -929,11 +955,14 @@ in
           end'
     '')
 
-    # Screenshots: `screenshot area` (drag a box) or `screenshot full`.
-    # Saves to ~/Pictures/Screenshots and copies the image to the clipboard.
+    # Screenshots: `screenshot area` (drag a box) or `screenshot full`
+    # save to ~/Pictures/Screenshots and copy the image to the clipboard;
+    # `screenshot annotate` drags a box and opens it in Satty to mark up,
+    # then copy (Ctrl+C) or save (Ctrl+S) to the same folder.
     grim
     slurp
     wl-clipboard
+    satty
     (writeShellScriptBin "screenshot" ''
       set -eu
       dir="$HOME/Pictures/Screenshots"
@@ -942,7 +971,12 @@ in
       case "''${1:-area}" in
         area) geom="$(slurp)" || exit 0; grim -g "$geom" "$file" ;;
         full) grim "$file" ;;
-        *) echo "usage: screenshot [area|full]" >&2; exit 1 ;;
+        annotate)
+          geom="$(slurp)" || exit 0
+          grim -g "$geom" - | exec satty --filename - \
+            --output-filename "$dir/%Y-%m-%d_%H-%M-%S.png" \
+            --copy-command wl-copy --early-exit ;;
+        *) echo "usage: screenshot [area|full|annotate]" >&2; exit 1 ;;
       esac
       wl-copy --type image/png < "$file"
       echo "$file"
@@ -1020,6 +1054,7 @@ in
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
+    noto-fonts-monochrome-emoji # one-colour emoji (the crab on the bar for RustRover)
     liberation_ttf
     open-sans # QGIS MaintenanceMap labels
     fira-code-symbols
