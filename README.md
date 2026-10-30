@@ -125,7 +125,7 @@ Plymouth splash, and **Esc** during the splash shows the boot messages.
 
 **Look:** Tokyo Night everywhere: GTK 3 and 4 (`Tokyonight-Dark`), Qt
 (Fusion style with a qt5ct/qt6ct palette), Papirus-Dark icons (indigo), the
-foot and Alacritty terminals (85% opaque), fuzzel, mako, swaylock, zathura and
+foot terminal (85% opaque), fuzzel, mako, swaylock, zathura and
 yazi. Fonts are IBM Plex Sans for the interface and VictorMono Nerd Font for
 monospace.
 
@@ -184,7 +184,7 @@ monospace.
 - **Office and documents:** LibreOffice, Obsidian, draw.io.
 - **PDFs and images:**
   - zathura (the default PDF viewer) and Okular (forms, annotations, signing)
-  - imv (the default image viewer), GIMP, Flameshot
+  - imv (the default image viewer), GIMP
 - **Media:** VLC; Libation (Audible library downloads); Snapshot (camera).
 - **Files:** Thunar (archive, volume and git plugins, plus custom right-click
   actions: terminal here, VS Code, QGIS, copy path), File Roller with 7-Zip,
@@ -221,7 +221,7 @@ monospace.
 - Claude Code, btop, bat, smartmontools, efibootmgr.
 
 **Games** (Super+Shift+G or "Games" in the launcher): Mines, Sudoku, Shattered
-Pixel Dungeon, Unciv, Battle for Wesnoth, OpenTTD, Steam.
+Pixel Dungeon, Unciv, OpenTTD, Steam.
 
 ## Services
 

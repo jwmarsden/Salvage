@@ -35,7 +35,7 @@
     "cursor": false,
     "format": "",
     "tooltip-format": "Terminal",
-    "on-click": "alacritty"
+    "on-click": "foot"
   },
   "custom/vscode": {
     "cursor": false,

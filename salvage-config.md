@@ -175,7 +175,7 @@ ever wanted back:
     Press Esc while selecting to cancel.
 - **Waybar:** `waybar` and `pavucontrol` were added to `environment.systemPackages`.
   - Its config is in `~/.config/waybar/config.jsonc` and `style.css`.
-  - Left: launchers for Chrome, Obsidian, Alacritty, IntelliJ IDEA (`intellij-idea`) and Steam,
+  - Left: launchers for Chrome, Obsidian, a terminal (foot), IntelliJ IDEA (`intellij-idea`) and Steam,
     then the workspaces.
   - Centre: the clock (hover for a calendar).
   - Right: volume (click opens pavucontrol, right-click mutes, scroll changes volume),

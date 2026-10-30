@@ -40,7 +40,6 @@ let
     { id = "org.gnome.Sudoku"; name = "Sudoku"; icon = "org.gnome.Sudoku"; pkg = pkgs.gnome-sudoku; }
     { id = "shattered-pixel-dungeon"; name = "Shattered Pixel Dungeon"; icon = "shattered-pixel-dungeon"; pkg = pkgs.shattered-pixel-dungeon; }
     { id = "unciv"; name = "Unciv"; icon = "unciv"; pkg = pkgs.unciv; }
-    { id = "org.wesnoth.Wesnoth"; name = "Battle for Wesnoth"; icon = "wesnoth-icon"; pkg = pkgs.wesnoth; }
     { id = "openttd"; name = "OpenTTD"; icon = "openttd"; pkg = pkgs.openttd; }
     { id = "steam"; name = "Steam"; icon = "steam"; pkg = pkgs.steam-unwrapped; main = true; }
   ];
@@ -308,7 +307,6 @@ in
       drawio # draw.io diagram editor
       blender # 3D modelling; inspect and repair meshes for cata.co scenes
       f3d # fast 3D model viewer (`f3d model.obj`)
-      flameshot
       fuzzel
       git-lfs
       google-chrome
@@ -354,7 +352,6 @@ in
       gnome-sudoku
       shattered-pixel-dungeon # roguelike
       unciv # Civilization V-style 4X
-      wesnoth # turn-based fantasy strategy
       openttd # transport tycoon
     ];
     # `npm install -g` can't write to the Nix store; put global packages in
@@ -397,9 +394,9 @@ in
         };
       };
     };
-    # Slightly see-through terminals so the wallpaper shows
-    # (foot = Super+Enter, alacritty = bar launcher).
-    # Both use the Tokyo Night palette (same blues as waybar and fuzzel).
+    # Slightly see-through terminal so the wallpaper shows (Super+Enter and
+    # the bar's terminal button), in the Tokyo Night palette (same blues as
+    # waybar and fuzzel).
     programs.foot = {
       enable = true;
       # Victor Mono's italic is a cursive script; use its plain slanted
@@ -427,22 +424,6 @@ in
         regular4 = "7aa2f7"; regular5 = "bb9af7"; regular6 = "7dcfff"; regular7 = "a9b1d6";
         bright0 = "414868"; bright1 = "f7768e"; bright2 = "9ece6a"; bright3 = "e0af68";
         bright4 = "7aa2f7"; bright5 = "bb9af7"; bright6 = "7dcfff"; bright7 = "c0caf5";
-      };
-    };
-    programs.alacritty = {
-      enable = true;
-      settings.window.opacity = 0.85;
-      settings.colors = {
-        primary = { background = "#1a1b26"; foreground = "#c0caf5"; };
-        selection = { background = "#33467c"; text = "#c0caf5"; };
-        normal = {
-          black = "#15161e"; red = "#f7768e"; green = "#9ece6a"; yellow = "#e0af68";
-          blue = "#7aa2f7"; magenta = "#bb9af7"; cyan = "#7dcfff"; white = "#a9b1d6";
-        };
-        bright = {
-          black = "#414868"; red = "#f7768e"; green = "#9ece6a"; yellow = "#e0af68";
-          blue = "#7aa2f7"; magenta = "#bb9af7"; cyan = "#7dcfff"; white = "#c0caf5";
-        };
       };
     };
     # Super+D launcher: blue theme matching the waybar colours (RRGGBBAA).
@@ -492,7 +473,7 @@ in
       enableZshIntegration = true;
       shellWrapperName = "yy"; # `yy` opens yazi and cds to where you quit it
       settings.mgr.sort_dir_first = true;
-      # Tokyo Night colours, matching foot/alacritty/waybar/fuzzel.
+      # Tokyo Night colours, matching foot/waybar/fuzzel.
       flavors.tokyo-night = pkgs.fetchFromGitHub {
         owner = "BennyOe";
         repo = "tokyo-night.yazi";
@@ -570,7 +551,7 @@ in
         "footclient" "foot-server"
         "thunar-bulk-rename" "thunar-settings" "thunar-volman-settings"
         "nm-connection-editor" "nixos-manual"
-        "org.flameshot.Flameshot" "Alacritty" "btop" "maestral" "blueman-adapters"
+        "btop" "maestral" "blueman-adapters"
         "qt5ct" "qt6ct" # Qt theme settings (managed here)
       ] ++ [
         (hideKeep "nvim" config.programs.neovim.finalPackage)
@@ -886,7 +867,6 @@ in
     file-roller
     _7zz-rar
     libnotify # notify-send
-    alacritty
     btop
     claude-code
     nano
@@ -1067,7 +1047,7 @@ in
     nerd-fonts.blex-mono      # "BlexMono Nerd Font Mono" (IBM Plex Mono)
     ibm-plex                  # IBM Plex Mono/Sans/Serif, original names
   ];
-  # Terminals (foot, alacritty) use "monospace"; point it at a Nerd Font so
+  # The terminal (foot) uses "monospace"; point it at a Nerd Font so
   # prompt glyphs render instead of boxes.
   fonts.fontconfig.defaultFonts.monospace = [
     "VictorMono Nerd Font Mono"
