@@ -58,7 +58,7 @@
       "class<foot>": "",
       "class<code.*>": "󰨞",
       "class<[Tt]hunar>": "",
-      "class<obsidian>": "󰠮",
+      "class<.*[Oo]bsidian.*>": "󰧑",
       "class<.*qgis.*>": "",
       "class<vlc>": "󰕼",
       "class<.*qbittorrent.*>": "",

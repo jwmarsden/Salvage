@@ -319,7 +319,10 @@ in
       libreoffice
       maestral # open-source Dropbox client (CLI: `maestral status`, etc.)
       maestral-gui
-      obsidian
+      # Obsidian draws only a blank window on Electron 43.8.3 (nixpkgs default
+      # since 2026-10-30: "webFrame[t] is not a function"); 44 works. Drop
+      # the override once nixpkgs moves on.
+      (obsidian.override { electron = electron_44; })
       slack
       teams-for-linux # unofficial Microsoft Teams desktop app (wraps the web app)
       snapshot # GNOME camera app: photos and video from the FaceTime HD webcam

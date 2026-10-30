@@ -51,19 +51,19 @@
   };
 
   # A middle power mode: in the "balanced" profile the CPU is capped at
-  # 2.0 GHz, so it doesn't jump to its 3.2 GHz turbo and the fanless case to
+  # 2.2 GHz, so it doesn't jump to its 3.2 GHz turbo and the fanless case to
   # 100°C; "performance" and "power-saver" keep the full range.
   # power-profiles-daemon has only the three profiles and no hooks, so this
   # follows its ActiveProfile changes and sets scaling_max_freq.
   systemd.services.cpu-cap-balanced = {
-    description = "Cap the CPU at 2.0 GHz in the balanced power profile";
+    description = "Cap the CPU at 2.2 GHz in the balanced power profile";
     wantedBy = [ "multi-user.target" ];
     after = [ "power-profiles-daemon.service" ];
     path = [ pkgs.power-profiles-daemon pkgs.dbus pkgs.coreutils ];
     script = ''
       apply() {
         if [ "$(powerprofilesctl get)" = balanced ]; then
-          max=2000000
+          max=2200000
         else
           max=$(cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq)
         fi
