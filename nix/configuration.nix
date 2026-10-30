@@ -333,6 +333,7 @@ in
       gimp # image editor
       libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
+      (callPackage ./mudlet-mooedit.nix { }) # MooEdit for Mudlet: @edit in your own editor (see the file)
       # MUD/MOO client with TLS, scripting and a mapper. Mudlet never sets
       # Qt's desktop file name, so its Wayland window has no app_id (sway
       # rules and waybar's workspace icons can't match it); set it to its
@@ -890,6 +891,10 @@ in
       useTheme = "robbyrussell";
     };
   };
+
+  # MooEdit's Mudlet loader package dofile()s its code from
+  # /etc/profiles/per-user/jwm/share/mudlet (see mudlet-mooedit.nix).
+  environment.pathsToLink = [ "/share/mudlet" ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
