@@ -293,13 +293,27 @@ workspace_layout tabbed
 default_border pixel 2
 default_floating_border normal
 hide_edge_borders --i3 smart  # no border when a window is alone on a workspace
-font pango:VictorMono Nerd Font Propo 10
+font pango:VictorMono Nerd Font Propo 9
 
+# Tabs match waybar: the focused tab is the blue of the focused workspace
+# pill and runs straight into the window's border; the rest sit on the bar's
+# dark background (#141824) with its grey text, so the tab row reads as part
+# of the bar.
 # class                 border  background text    indicator child_border
-client.focused          #7aa2f7 #3d59a1    #ffffff #7dcfff   #7aa2f7
-client.focused_inactive #414868 #24283b    #c0caf5 #414868   #414868
-client.unfocused        #24283b #1a1b26    #a9b1d6 #24283b   #24283b
+client.focused          #7aa2f7 #7aa2f7    #1a1b26 #7dcfff   #7aa2f7
+client.focused_inactive #24283b #24283b    #c0caf5 #24283b   #414868
+client.unfocused        #141824 #141824    #8a90a6 #141824   #24283b
 client.urgent           #f7768e #f7768e    #1a1b26 #f7768e   #f7768e
+title_align center
+titlebar_padding 8 2
+titlebar_border_thickness 0
+
+# SwayFX (programs.sway.package in configuration.nix): rounded corners, with a
+# small gap so the rounded tops of the tabs sit clear of the bar; no line
+# between a tab and its window.
+corner_radius 10
+gaps outer 2
+titlebar_separator disable
 
 # Show / hide the focused window's title bar.
 bindsym $mod+t border normal

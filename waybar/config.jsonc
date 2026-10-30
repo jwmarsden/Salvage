@@ -70,14 +70,42 @@
       "class<jetbrains-pycharm>": "",
       // Nerd Fonts has no crab, so use the one-colour Noto Emoji one
       // (U+FE0E asks for the text-style glyph, not the colour emoji)
-      "class<jetbrains-rustrover>": "<span font='Noto Emoji'>🦀\ufe0e</span>"
+      "class<jetbrains-rustrover>": "<span font='Noto Emoji'>🦀\ufe0e</span>",
+      // Mudlet: the Noto Emoji cow (tkMOO-light has the Nerd Fonts one); its
+      // app_id comes from a patch in configuration.nix
+      "class<mudlet>": "<span font='Noto Emoji'>🐄\ufe0e</span>"
     }
   },
 
   "clock": {
     "cursor": false,
     "format": "{:%a %d %b  %H:%M}",
-    "tooltip-format": "<tt>{calendar}</tt>"
+    "tooltip-format": "<tt>{calendar}</tt>",
+    // Hover calendar in Tokyo Night: week numbers on the left, today as a
+    // blue block. Scroll over the clock to flip months; right-click for the
+    // year (back to the month view on the next right-click).
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "weeks-pos": "left",
+      "on-scroll": 1,
+      "format": {
+        "months":   "<span color='#c0caf5'><b>{}</b></span>",
+        "weekdays": "<span color='#7aa2f7'><b>{}</b></span>",
+        "weeks":    "<span color='#565f89'>{:%V}</span>",
+        "days":     "<span color='#a9b1d6'>{}</span>",
+        "today":    "<span background='#7aa2f7' color='#1a1b26'><b>{}</b></span>"
+      }
+    },
+    // Click: today's Daily note in Obsidian (the Journals plugin's own
+    // obsidian://journals link; creates it from the template if needed), then
+    // jump to Obsidian's workspace.
+    "on-click": "xdg-open 'obsidian://journals?vault=JWMVault&journal=Daily'; sleep 1; swaymsg -q '[app_id=md.obsidian.Obsidian] focus'",
+    "actions": {
+      "on-click-right": "mode",
+      "on-scroll-up": "shift_down",
+      "on-scroll-down": "shift_up"
+    }
   },
 
   // Click to open the volume mixer; scroll to change volume.

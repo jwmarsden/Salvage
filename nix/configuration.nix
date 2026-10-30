@@ -98,6 +98,9 @@ in
   programs.nm-applet.enable = true;
 
   programs.sway.enable = true;
+  # SwayFX: sway plus rounded corners, shadows and blur (corner_radius and
+  # friends in sway/config); otherwise reads the same config.
+  programs.sway.package = pkgs.swayfx;
   # Screen sharing (Teams, browsers, OBS) through xdg-desktop-portal-wlr. The
   # sway module turns this on already; it's spelled out here, with slurp as
   # the picker: click the screen to share when more than one is connected.
@@ -330,7 +333,23 @@ in
       gimp # image editor
       libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
-      mudlet # MUD/MOO client with TLS, scripting and a mapper
+      # MUD/MOO client with TLS, scripting and a mapper. Mudlet never sets
+      # Qt's desktop file name, so its Wayland window has no app_id (sway
+      # rules and waybar's workspace icons can't match it); set it to its
+      # mudlet.desktop. Builds Mudlet from source, so it's pinned to the
+      # nixpkgs it was first built against (nixos-unstable, 2026-10-30): the
+      # build is reused rather than redone whenever Qt or Mudlet update. Bump
+      # the rev and hash to update it (`nix-prefetch-url --unpack <url>`).
+      ((import (builtins.fetchTarball {
+        url = "https://github.com/NixOS/nixpkgs/archive/31ecbaca1bdefa45dffc409f0250bd8039ea0010.tar.gz";
+        sha256 = "1lzqyss0pznfh3az0llsp4a7c8gqcyq8wf96fnl5cnh5b3lic6kn";
+      }) { system = stdenv.hostPlatform.system; }).mudlet.overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace src/main.cpp --replace-fail \
+            'app->setOrganizationName(qsl("Mudlet"));' \
+            'app->setOrganizationName(qsl("Mudlet")); app->setDesktopFileName(qsl("mudlet"));'
+        '';
+      }))
       python3
       nodejs # Node.js LTS, with npm and npx
       dotnet-sdk_10 # .NET 10 SDK and runtime (`dotnet`); LTS, supported to Nov 2028
@@ -381,6 +400,16 @@ in
         ignoreDups = true;
         share = true;
       };
+      # Window title (the sway tab and foot's title): the running command
+      # while it runs, e.g. "btop", and the directory at the prompt.
+      initContent = ''
+        _title() { printf '\e]2;%s\a' "$1"; }
+        _title_preexec() { _title "''${1[1,60]}"; }
+        _title_precmd() { _title "''${PWD/#$HOME/~}"; }
+        autoload -Uz add-zsh-hook
+        add-zsh-hook preexec _title_preexec
+        add-zsh-hook precmd _title_precmd
+      '';
     };
     programs.git = {
       enable = true;
@@ -833,8 +862,8 @@ in
           { timeout = 300; command = lock; }
           {
             timeout = 600;
-            command = "${pkgs.sway}/bin/swaymsg 'output * power off'";
-            resumeCommand = "${pkgs.sway}/bin/swaymsg 'output * power on'";
+            command = "${config.programs.sway.package}/bin/swaymsg 'output * power off'";
+            resumeCommand = "${config.programs.sway.package}/bin/swaymsg 'output * power on'";
           }
         ];
         events.lock = lock;
