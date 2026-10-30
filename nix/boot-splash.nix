@@ -43,11 +43,9 @@ in
 
   # Silent boot: only show messages if something goes wrong.
   boot.consoleLogLevel = 3;
-  boot.initrd.verbose = false;
   boot.kernelParams = [
     "quiet"
     "splash"
-    "boot.shell_on_fail"
     "udev.log_level=3"
     "rd.udev.log_level=3"
     "systemd.show_status=auto"

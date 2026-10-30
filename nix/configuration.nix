@@ -329,6 +329,7 @@ in
       gimp # image editor
       libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
+      mudlet # MUD/MOO client with TLS, scripting and a mapper
       python3
       nodejs # Node.js LTS, with npm and npx
       dotnet-sdk_10 # .NET 10 SDK and runtime (`dotnet`); LTS, supported to Nov 2028

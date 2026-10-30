@@ -38,6 +38,18 @@
     '';
   };
 
+  # Low battery: shut down cleanly rather than run flat. A dead battery once
+  # left the firmware showing the flashing folder on the next power-on
+  # (2026-10-29). Hibernation would need a resume device and the NVMe's
+  # sleep quirks, so the critical action is a plain power-off.
+  services.upower = {
+    enable = true;
+    percentageLow = 10;
+    percentageCritical = 5;
+    percentageAction = 3;
+    criticalPowerAction = "PowerOff";
+  };
+
   services.logind.settings.Login = {
     # Lid closed: suspend, on battery or the charger; stay on when docked.
     HandleLidSwitch = "suspend";

@@ -287,6 +287,9 @@ bindsym $mod+r mode "resize"
 # No title bars on tiled windows: just a thin border, Tokyo Night blue when
 # focused. Floating windows (dialogs, popups) keep their title bar.
 # Tabbed/stacked layouts still show tabs.
+# New workspaces start tabbed ($mod+w): a second window opens as a tab, not a
+# split. $mod+e goes back to splits. A lone window shows no tab bar (--i3 below).
+workspace_layout tabbed
 default_border pixel 2
 default_floating_border normal
 hide_edge_borders --i3 smart  # no border when a window is alone on a workspace
