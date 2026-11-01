@@ -334,7 +334,7 @@ in
       gimp # image editor
       libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
-      (callPackage ./tinyjs.nix { }) # tinyjs: JS desktop apps on txiki.js + WebKitGTK (MooMoo is one)
+      (callPackage ./tinyjs.nix { }) # tinyjs: JS desktop apps on txiki.js + WebKitGTK (moocat is one)
       python3
       nodejs # Node.js LTS, with npm and npx
       dotnet-sdk_10 # .NET 10 SDK and runtime (`dotnet`); LTS, supported to Nov 2028
