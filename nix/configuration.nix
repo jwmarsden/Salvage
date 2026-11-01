@@ -313,6 +313,7 @@ in
       fuzzel
       git-lfs
       google-chrome
+      qutebrowser # keyboard-driven browser (vim keys; passwords via Super+P)
       hunspellDicts.en_AU # spell checking for LibreOffice
       kdePackages.okular # PDF annotation/forms/signing (zathura is the default viewer)
       jetbrains.idea
@@ -333,24 +334,7 @@ in
       gimp # image editor
       libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
-      (callPackage ./mudlet-mooedit.nix { }) # MooEdit for Mudlet: @edit in your own editor (see the file)
-      # MUD/MOO client with TLS, scripting and a mapper. Mudlet never sets
-      # Qt's desktop file name, so its Wayland window has no app_id (sway
-      # rules and waybar's workspace icons can't match it); set it to its
-      # mudlet.desktop. Builds Mudlet from source, so it's pinned to the
-      # nixpkgs it was first built against (nixos-unstable, 2026-10-30): the
-      # build is reused rather than redone whenever Qt or Mudlet update. Bump
-      # the rev and hash to update it (`nix-prefetch-url --unpack <url>`).
-      ((import (builtins.fetchTarball {
-        url = "https://github.com/NixOS/nixpkgs/archive/31ecbaca1bdefa45dffc409f0250bd8039ea0010.tar.gz";
-        sha256 = "1lzqyss0pznfh3az0llsp4a7c8gqcyq8wf96fnl5cnh5b3lic6kn";
-      }) { system = stdenv.hostPlatform.system; }).mudlet.overrideAttrs (old: {
-        postPatch = (old.postPatch or "") + ''
-          substituteInPlace src/main.cpp --replace-fail \
-            'app->setOrganizationName(qsl("Mudlet"));' \
-            'app->setOrganizationName(qsl("Mudlet")); app->setDesktopFileName(qsl("mudlet"));'
-        '';
-      }))
+      (callPackage ./tinyjs.nix { }) # tinyjs: JS desktop apps on txiki.js + WebKitGTK (MooMoo is one)
       python3
       nodejs # Node.js LTS, with npm and npx
       dotnet-sdk_10 # .NET 10 SDK and runtime (`dotnet`); LTS, supported to Nov 2028
@@ -891,10 +875,6 @@ in
       useTheme = "robbyrussell";
     };
   };
-
-  # MooEdit's Mudlet loader package dofile()s its code from
-  # /etc/profiles/per-user/jwm/share/mudlet (see mudlet-mooedit.nix).
-  environment.pathsToLink = [ "/share/mudlet" ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
