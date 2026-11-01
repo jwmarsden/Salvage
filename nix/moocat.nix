@@ -5,10 +5,10 @@
 { callPackage, tinyjs }:
 
 let
-  rev = "3b46a911d36b3b552ed7a454112689a0956aef75";
+  rev = "556935157c9e8c9f508ce64f37b83572987b5d17";
   src = builtins.fetchTarball {
     url = "https://github.com/jwmarsden/moocat/archive/${rev}.tar.gz";
-    sha256 = "0cv6c42awccb5ys1gh6ngygjkx4x1r3nvky59fhwns8m6qsm9sk3";
+    sha256 = "0ry8pp6blpb6bvjmwi3vrnd1qc3nr68hzqc44798ab4d254b8g5h";
   };
 in
 callPackage "${src}/packaging/nix/moocat.nix" { inherit tinyjs; }
