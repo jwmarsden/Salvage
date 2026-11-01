@@ -335,6 +335,7 @@ in
       libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
       (callPackage ./tinyjs.nix { }) # tinyjs: JS desktop apps on txiki.js + WebKitGTK (moocat is one)
+      (callPackage ./moocat.nix { tinyjs = callPackage ./tinyjs.nix { }; }) # moocat, the MOO client, from GitHub (see the file)
       python3
       nodejs # Node.js LTS, with npm and npx
       dotnet-sdk_10 # .NET 10 SDK and runtime (`dotnet`); LTS, supported to Nov 2028
