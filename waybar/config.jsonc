@@ -74,8 +74,9 @@
       // Nerd Fonts has no crab, so use the one-colour Noto Emoji one
       // (U+FE0E asks for the text-style glyph, not the colour emoji)
       "class<jetbrains-rustrover>": "<span font='Noto Emoji'>🦀\ufe0e</span>",
-      // moocat (and its SMud windows): the Noto Emoji cat
-      "class<app.moocat>": "<span font='Noto Emoji'>🐈\ufe0e</span>"
+      // moocat (and its SMud windows): its cat-headed speech bubble, as on
+      // cata.co (U+E000 in the MoocatIcon font, nix/configuration.nix)
+      "class<app.moocat>": "<span font='MoocatIcon'>\ue000</span>"
     }
   },
 

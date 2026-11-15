@@ -1058,6 +1058,12 @@ in
     open-sans # QGIS MaintenanceMap labels
     fira-code-symbols
     nerd-fonts.symbols-only # prompt icons for oh-my-posh
+    # moocat's cat-headed speech bubble (cata.co's nav icon) as one glyph,
+    # U+E000 in "MoocatIcon", for the bar. Made from fonts/moocat-icon.svg:
+    # Inkscape stroke-to-path, then FontForge.
+    (runCommand "moocat-icon-font" { } ''
+      install -Dm644 ${../fonts/moocat-icon.otf} $out/share/fonts/opentype/moocat-icon.otf
+    '')
     # Narrower monospace candidates (try: foot -f "<name>:size=11")
     nerd-fonts.iosevka        # "Iosevka Nerd Font Mono"
     nerd-fonts.jetbrains-mono # "JetBrainsMono Nerd Font Mono"
