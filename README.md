@@ -71,7 +71,6 @@ The short version:
 | [`nix/facetimehd-macbook10.nix`](nix/facetimehd-macbook10.nix) | Camera firmware, calibration file and driver patches |
 | [`nix/power.nix`](nix/power.nix) | Suspend, lid and wake settings |
 | [`nix/boot-splash.nix`](nix/boot-splash.nix) | Quiet boot: hidden boot menu, Tokyo Night Plymouth splash, console palette |
-| [`nix/tkmoo.nix`](nix/tkmoo.nix) | Local package: tkMOO-light 0.3.32 (not in nixpkgs) |
 | [`sway/config`](sway/config) | Sway config (symlinked from `~/.config/sway/config`) |
 | [`waybar/`](waybar/) | Waybar config and style (symlinked from `~/.config/waybar/`) |
 | [`walls/`](walls/) | Wallpapers: `stormlight_02.png` for the desktop and the login screen |
@@ -191,8 +190,7 @@ monospace.
   yazi.
 - **Passwords:** Bitwarden desktop, `rbw` and `rofi-rbw`, Seahorse (keyring).
 - **Torrents:** qBittorrent, bound to the NordVPN interface.
-- **MOO:** tkMOO-light (`tkmoo`). For the pop-up editor, turn on Out of Band →
-  "Old-style local edit", and on the MOO run `@edit-options +local`.
+- **MOO:** moocat, built from its GitHub repo (`nix/moocat.nix`).
 
 **Engineering and GIS**
 - **QGIS**, GDAL, PROJ, tippecanoe, DuckDB (spatial), `psql` 17, DBeaver.
@@ -280,7 +278,6 @@ hand:
 | Database data | Docker volumes `timescaledb_ha_data`, `geodb-data`, `redis-data`, `cata-db-data`, `cata-redis-data` |
 | EFI variables | `StartupMute`, `SystemAudioVolume`, `SystemAudioVolumeDB`, `Boot0080`; see [macbook-boot-fix.md](macbook-boot-fix.md) |
 | Sign-ins | `gh auth login`, `nordvpn login`, `onedrive`, Maestral, `rbw login`, Chrome sync, Libation |
-| tkMOO worlds and settings | `~/.tkMOO-lite` |
 | Alternative audio driver (unreviewed, not used) | `~/macbook12-issue73/` |
 
 ## Fresh install, roughly

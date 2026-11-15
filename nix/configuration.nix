@@ -333,7 +333,6 @@ in
       thunderbird # email (Gmail, Office 365), calendar and contacts
       gimp # image editor
       libation # Audible library manager: downloads audiobooks as plain files
-      (callPackage ./tkmoo.nix { }) # tkMOO-light MOO client, packaged here (pop-up local editor)
       (callPackage ./tinyjs.nix { }) # tinyjs: JS desktop apps on txiki.js + WebKitGTK (moocat is one)
       (callPackage ./moocat.nix { tinyjs = callPackage ./tinyjs.nix { }; }) # moocat, the MOO client, from GitHub (see the file)
       python3
