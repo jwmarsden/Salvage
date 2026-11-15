@@ -8,10 +8,12 @@
 #      (1675_01XX.dat, sensor 0005/9774), both cut out of AppleCamera.sys in
 #      Apple's Boot Camp package. Apple's files can't be redistributed, so
 #      this builds them locally from Apple's own download.
-#   2. A driver patch for this model's 640x480 sensor and its Apple ACPI
-#      power-on (CMPE at \_SB_.PCI0.RP10.CMRA), from
-#      github.com/neron82/macbook10-1-facetimehd-linux, pinned by commit and
-#      hash (GPL-2.0, like the driver; reviewed 2026-10-22).
+#   2. Driver support for this model's sensor size and its Apple ACPI
+#      power-on (CMPE). Up to driver 0.7.0 that was a patch from
+#      github.com/neron82/macbook10-1-facetimehd-linux; driver 0.7.2 (nixpkgs,
+#      Nov 2026) has its own, for the 12-inch MacBook8,1, which the patch no
+#      longer applies over. Dropped 2026-11-15 to try 0.7.2's: if the camera
+#      stops working, port the patch (commit 61a875ff1a0f) to 0.7.2.
 #   3. Kernel 7.x dropped strncpy, which the driver uses: strscpy instead.
 #
 # It shows up as /dev/video0 ("Apple Facetime HD", 640x480) for Snapshot,
@@ -28,12 +30,6 @@
     (final: prev: {
       linuxPackages_latest = prev.linuxPackages_latest.extend (kfinal: kprev: {
         facetimehd = kprev.facetimehd.overrideAttrs (o: {
-          patches = (o.patches or [ ]) ++ [
-            (final.fetchurl {
-              url = "https://raw.githubusercontent.com/neron82/macbook10-1-facetimehd-linux/61a875ff1a0f9eac1aea10f05d31950542d6538a/patches/0001-macbook10-1-facetimehd-480p-fw155-support.patch";
-              hash = "sha256-xbPqUOFOt1XJokYzpf7/GKHCdChwA2/oGUIv9U96Hk4=";
-            })
-          ];
           postPatch = (o.postPatch or "") + ''
             sed -i 's/\bstrncpy(/strscpy(/g' fthd_v4l2.c
           '';
