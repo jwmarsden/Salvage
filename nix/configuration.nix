@@ -342,6 +342,13 @@ in
       # Rust: rustup manages rustc/cargo toolchains; gcc provides the linker
       rustup
       gcc
+      # C/C++ builds: cmake -B build && cmake --build build. Libraries (Boost, zlib...) aren't
+      # found from a global install on NixOS; a project's flake (nix develop) provides those
+      cmake
+      gnumake
+      ninja
+      gdb
+      pkg-config
       vscode
       vlc # video/audio player
       qbittorrent # torrents (bound to the nordlynx VPN interface)
