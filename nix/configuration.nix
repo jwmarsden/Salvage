@@ -313,7 +313,6 @@ in
       fuzzel
       git-lfs
       google-chrome
-      qutebrowser # keyboard-driven browser (vim keys; passwords via Super+P)
       hunspellDicts.en_AU # spell checking for LibreOffice
       kdePackages.okular # PDF annotation/forms/signing (zathura is the default viewer)
       jetbrains.idea
