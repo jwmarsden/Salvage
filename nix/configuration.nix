@@ -1106,8 +1106,21 @@ in
 
   # List services that you want to enable:
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
+  # SSH server, for a terminal from another machine (`ssh jwm@salvage.local`).
+  # Keys only: no passwords, no root. A machine can log in once its public key
+  # (its ~/.ssh/id_ed25519.pub) is in authorizedKeys below.
+  services.openssh = {
+    enable = true; # port 22, opened in the firewall
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+      AllowUsers = [ "jwm" ];
+    };
+  };
+  users.users.jwm.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPygS5Rt3ch5sOPDh68EjBm5bBrc4zExvMOYeEpWKNjj jwmar@sydney" # Sydney (the i9)
+  ];
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
