@@ -895,6 +895,7 @@ in
     libnotify # notify-send
     btop
     claude-code
+    codex # OpenAI Codex CLI: sign in with the ChatGPT account (`codex`)
     nano
     pavucontrol
     smartmontools # smartctl: SSD health (`sudo smartctl -a /dev/nvme0`)
