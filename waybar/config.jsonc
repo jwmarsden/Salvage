@@ -67,6 +67,9 @@
       "class<.*steam.*>": "",
       "class<DBeaver>": "󰆼",
       "class<Tkmoo>": "󰆚",
+      "class<bitwarden>": "󰦝",
+      "class<teams-for-linux>": "󰊻",
+      "class<slack>": "",
       "class<jetbrains-pycharm>": "",
       // Nerd Fonts has no crab, so use the one-colour Noto Emoji one
       // (U+FE0E asks for the text-style glyph, not the colour emoji)
