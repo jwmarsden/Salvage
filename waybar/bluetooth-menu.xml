@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The Bluetooth icon's right-click menu; each item's id is a menu-actions
+     entry in config.jsonc, which runs waybar-bluetooth -->
+<interface>
+  <object class="GtkMenu" id="menu">
+    <child><object class="GtkMenuItem" id="mouse"><property name="label">Reconnect mouse</property></object></child>
+    <child><object class="GtkMenuItem" id="headphones"><property name="label">Reconnect headphones</property></object></child>
+    <child><object class="GtkMenuItem" id="all"><property name="label">Reconnect all paired</property></object></child>
+    <child><object class="GtkSeparatorMenuItem" id="sep1"/></child>
+    <child><object class="GtkMenuItem" id="repair"><property name="label">Re-pair mouse…</property></object></child>
+    <child><object class="GtkMenuItem" id="reset"><property name="label">Reset Bluetooth adapter</property></object></child>
+    <child><object class="GtkSeparatorMenuItem" id="sep2"/></child>
+    <child><object class="GtkMenuItem" id="manager"><property name="label">Bluetooth manager</property></object></child>
+  </object>
+</interface>

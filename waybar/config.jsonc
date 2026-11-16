@@ -16,7 +16,7 @@
     "sway/mode"
   ],
   "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "custom/vpn", "custom/onedrive", "network", "power-profiles-daemon", "temperature", "battery", "tray"],
+  "modules-right": ["pulseaudio", "custom/vpn", "custom/onedrive", "custom/bluetooth", "network", "power-profiles-daemon", "temperature", "battery", "tray"],
 
   // App launchers: click to open.
   "custom/thunar": {
@@ -138,6 +138,27 @@
     "interval": 5,
     "on-click": "foot journalctl --user -fu onedrive@onedrive -o cat",
     "on-click-right": "systemctl --user restart onedrive@onedrive"
+  },
+  // Bluetooth: click for the manager; right-click for a menu that wakes a
+  // paired device's link, re-pairs the mouse, or resets the adapter
+  // (waybar-bluetooth, in nix/configuration.nix).
+  "custom/bluetooth": {
+    "cursor": false,
+    "exec": "waybar-bluetooth",
+    "return-type": "json",
+    "interval": 10,
+    "signal": 9,
+    "on-click": "blueman-manager",
+    "menu": "on-click-right",
+    "menu-file": "/home/jwm/nix-config/waybar/bluetooth-menu.xml",
+    "menu-actions": {
+      "mouse": "waybar-bluetooth connect mouse",
+      "headphones": "waybar-bluetooth connect headphones",
+      "all": "waybar-bluetooth connect all",
+      "repair": "waybar-bluetooth repair mouse",
+      "reset": "waybar-bluetooth reset",
+      "manager": "blueman-manager"
+    }
   },
   "network": {
     "cursor": false,

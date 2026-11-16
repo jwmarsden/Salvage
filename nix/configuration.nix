@@ -116,7 +116,8 @@ in
   services.thermald.enable = true;
   services.power-profiles-daemon.enable = true;
 
-  # Bluetooth; pair devices from the blueman tray icon (home-manager below).
+  # Bluetooth; the bar's Bluetooth icon reconnects and re-pairs (waybar-bluetooth),
+  # and blueman-manager pairs new devices (home-manager below).
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
@@ -873,8 +874,10 @@ in
       temperature.night = 4000;
     };
 
-    # Bluetooth tray icon.
+    # Blueman's applet, for pairing prompts, without its tray icon: the bar's
+    # own Bluetooth module (waybar-bluetooth) stands in for it.
     services.blueman-applet.enable = true;
+    dconf.settings."org/blueman/general".plugin-list = [ "!StatusIcon" ];
     programs.home-manager.enable = true;
     programs.java.enable = true;
     programs.oh-my-posh = {
@@ -922,6 +925,90 @@ in
       else
         printf '{"text":"\uf09c","class":"disconnected","tooltip":"NordVPN off\\nClick: connect  Right-click: NordVPN app"}\n'
       fi
+    '')
+
+    # Waybar Bluetooth indicator: prints status JSON (off / on / connected,
+    # with what's connected in the tooltip). Its right-click menu
+    # (waybar/bluetooth-menu.xml) runs the rest: `waybar-bluetooth connect
+    # mouse|headphones|all` wakes a paired device's link (a few tries, with a
+    # scan between, as a sleeping LE mouse only answers when it advertises);
+    # `repair mouse` forgets and pairs it again; `reset` turns the adapter off
+    # and on and reconnects. Signal 9 refreshes the icon.
+    (writeShellScriptBin "waybar-bluetooth" ''
+      bt=${pkgs.bluez}/bin/bluetoothctl
+      jq=${pkgs.jq}/bin/jq
+      notify() { ${pkgs.libnotify}/bin/notify-send -t "''${3:-5000}" -h string:x-canonical-private-synchronous:bluetooth -i bluetooth "$1" "$2"; }
+      refresh() { pkill -RTMIN+9 waybar; }
+      name() { $bt info "$1" | sed -n 's/^\s*Name: //p'; }
+      connected() { $bt info "$1" 2>/dev/null | grep -q 'Connected: yes'; }
+      # Paired devices of a kind, by their icon: mouse, headphones, or all
+      devices() {
+        for m in $($bt devices Paired | awk '{print $2}'); do
+          case "$1" in
+            mouse) $bt info "$m" | grep -q 'Icon: input-mouse' && echo "$m" ;;
+            headphones) $bt info "$m" | grep -q 'Icon: audio-' && echo "$m" ;;
+            *) echo "$m" ;;
+          esac
+        done
+      }
+      # One device: connect, and if it doesn't answer, scan a few seconds so the
+      # adapter hears it advertising, then try again
+      connect() {
+        local mac=$1 n
+        n=$(name "$mac")
+        if connected "$mac"; then notify "$n" "Already connected"; return 0; fi
+        notify "$n" "Connecting… click or move it to wake it" 25000
+        for try in 1 2 3; do
+          $bt --timeout 8 connect "$mac" >/dev/null 2>&1
+          if connected "$mac"; then notify "$n" "Connected"; refresh; return 0; fi
+          $bt --timeout 5 scan on >/dev/null 2>&1
+        done
+        notify "$n" "Couldn't connect. If it keeps failing, right-click → Re-pair." 10000
+        return 1
+      }
+      case "''${1:-}" in
+        connect)
+          $bt power on >/dev/null 2>&1
+          macs=$(devices "''${2:-all}")
+          [ -z "$macs" ] && { notify Bluetooth "No paired ''${2:-} found"; exit 1; }
+          for m in $macs; do connect "$m"; done
+          refresh ;;
+        repair)
+          mac=$(devices "''${2:-mouse}" | head -1)
+          [ -z "$mac" ] && { notify Bluetooth "No paired ''${2:-mouse} found"; exit 1; }
+          n=$(name "$mac")
+          notify "$n" "Put it in pairing mode now (hold its button until the light blinks)…" 30000
+          $bt remove "$mac" >/dev/null 2>&1
+          $bt --timeout 25 scan on >/dev/null 2>&1 &
+          for i in $(seq 25); do $bt info "$mac" >/dev/null 2>&1 && break; sleep 1; done
+          if $bt --timeout 20 pair "$mac" >/dev/null 2>&1; then
+            $bt trust "$mac" >/dev/null 2>&1
+            $bt --timeout 10 connect "$mac" >/dev/null 2>&1
+          fi
+          wait
+          if connected "$mac"; then notify "$n" "Paired and connected"; else notify "$n" "Didn't pair: try again with it in pairing mode" 10000; fi
+          refresh ;;
+        reset)
+          notify Bluetooth "Restarting the adapter…"
+          $bt power off >/dev/null 2>&1; sleep 2; $bt power on >/dev/null 2>&1; sleep 2
+          for m in $(devices all); do
+            $bt info "$m" | grep -q 'Trusted: yes' && $bt --timeout 8 connect "$m" >/dev/null 2>&1
+          done
+          refresh
+          notify Bluetooth "Adapter restarted" ;;
+        *)
+          help="Click: Bluetooth manager  Right-click: reconnect, re-pair, reset"
+          if ! $bt show 2>/dev/null | grep -q 'Powered: yes'; then
+            $jq -cn --arg h "$help" '{text:"󰂲", class:"off", tooltip:("Bluetooth off\n" + $h)}'
+            exit 0
+          fi
+          names=$($bt devices Connected | cut -d' ' -f3-)
+          if [ -n "$names" ]; then
+            $jq -cn --arg n "$names" --arg h "$help" '{text:"󰂱", class:"connected", tooltip:("Connected:\n" + $n + "\n" + $h)}'
+          else
+            $jq -cn --arg h "$help" '{text:"󰂯", class:"on", tooltip:("Bluetooth on, nothing connected\n" + $h)}'
+          fi ;;
+      esac
     '')
 
     # Waybar OneDrive indicator: reads the onedrive@onedrive service log and

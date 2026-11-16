@@ -83,6 +83,7 @@ tooltip label {
 #pulseaudio,
 #custom-vpn,
 #custom-onedrive,
+#custom-bluetooth,
 #network,
 #power-profiles-daemon,
 #temperature,
@@ -103,6 +104,9 @@ tooltip label {
 #custom-onedrive.syncing { color: #7dcfff; }
 #custom-onedrive.error   { color: #f7768e; }
 #custom-onedrive.stopped { color: #565f89; }
+#custom-bluetooth.on        { color: #7aa2f7; }
+#custom-bluetooth.connected { color: #7dcfff; }
+#custom-bluetooth.off       { color: #565f89; }
 
 #power-profiles-daemon.performance { color: #f7768e; }
 #power-profiles-daemon.balanced    { color: #7aa2f7; }
