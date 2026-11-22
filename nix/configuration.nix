@@ -875,9 +875,12 @@ in
     };
 
     # Blueman's applet, for pairing prompts, without its tray icon: the bar's
-    # own Bluetooth module (waybar-bluetooth) stands in for it.
+    # own Bluetooth module (waybar-bluetooth) stands in for it. StatusIcon alone
+    # isn't enough, as StatusNotifierItem and ShowConnected load it anyway and
+    # it starts blueman-tray; with StatusNotifierItem off there's nothing for
+    # the bar's tray to show.
     services.blueman-applet.enable = true;
-    dconf.settings."org/blueman/general".plugin-list = [ "!StatusIcon" ];
+    dconf.settings."org/blueman/general".plugin-list = [ "!StatusIcon" "!StatusNotifierItem" "!ShowConnected" ];
     programs.home-manager.enable = true;
     programs.java.enable = true;
     programs.oh-my-posh = {
