@@ -288,6 +288,11 @@ in
   # Use the system nixpkgs (and its allowUnfree) for home-manager.
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
+  # At boot the activation writes dconf settings through a throwaway D-Bus
+  # session with no XDG_RUNTIME_DIR. GIO then starts gvfsd, which mounts its
+  # FUSE fallback at ~/.gvfs, and that mount dies with the session ("Connection
+  # refused" in Thunar). Keep GIO local during activation.
+  systemd.services.home-manager-jwm.environment.GIO_USE_VFS = "local";
 
   home-manager.users.jwm = { pkgs, ... }: {
     # The state version is required and should stay at the version you
@@ -1158,6 +1163,14 @@ in
     noto-fonts-monochrome-emoji # one-colour emoji (the crab on the bar for RustRover)
     liberation_ttf
     open-sans # QGIS MaintenanceMap labels
+    corefonts # Microsoft's core fonts: Arial, Times New Roman, Verdana, Georgia...
+    # Tahoma (regular and bold): Wine's metric-compatible one, alone, as the
+    # rest of wine-fonts (Courier, System, Symbol...) would shadow other fonts.
+    (runCommand "tahoma-font" { } ''
+      install -Dm644 -t $out/share/fonts/truetype \
+        ${winePackages.fonts}/share/fonts/truetype/tahoma.ttf \
+        ${winePackages.fonts}/share/fonts/truetype/tahomabd.ttf
+    '')
     fira-code-symbols
     nerd-fonts.symbols-only # prompt icons for oh-my-posh
     # moocat's cat-headed speech bubble (cata.co's nav icon) as one glyph,
