@@ -12,6 +12,7 @@
     "custom/chrome",
     "custom/terminal",
     "custom/vscode",
+    "custom/artcraft",
     "sway/workspaces",
     "sway/mode"
   ],
@@ -44,6 +45,18 @@
     "on-click": "code"
   },
 
+  // ArtCraft Launcher: install, update and open the Craft apps. Runs the Exec
+  // line of its own desktop entry, which it rewrites when it updates itself,
+  // so this keeps working after the AppImage's name changes (there's no
+  // gtk-launch here). If it's already running in the tray, a second start
+  // brings its window back.
+  "custom/artcraft": {
+    "cursor": false,
+    "format": "󰀻",
+    "tooltip-format": "ArtCraft Launcher",
+    "on-click": "eval \"exec $(sed -n 's/^Exec=//p' $HOME/.local/share/applications/ai.storyteller.artcraft-launcher.desktop)\""
+  },
+
   "sway/workspaces": {
     "cursor": false,
     "disable-scroll": true,
@@ -73,6 +86,33 @@
       // Nerd Fonts has no crab, so use the one-colour Noto Emoji one
       // (U+FE0E asks for the text-style glyph, not the colour emoji)
       "class<jetbrains-rustrover>": "<span font='Noto Emoji'>🦀\ufe0e</span>",
+      // ArtCraft apps (the Craft App Suite, installed by the ArtCraft Launcher into
+      // ~/Applications): a Material Design glyph for each, in the workspace
+      // colours like the rest. Their windows
+      // are ai.storyteller.<app> (some XWayland ones are just <app>). The
+      // launcher comes first, so the ArtCraft rule can't catch it.
+      "class<(.*\\.)?artcraft-launcher>": "󰀻",
+      "class<(.*\\.)?photocraft>": "󱇣",   // PhotoCraft: Image editing
+      "class<(.*\\.)?vectorcraft>": "󰫨",   // VectorCraft: Vector illustration
+      "class<(.*\\.)?filmcraft>": "󰈰",   // FilmCraft: Video editing, color and sound
+      "class<(.*\\.)?lightcraft>": "󰄄",   // LightCraft: Photo library and raw development
+      "class<(.*\\.)?pdfcraft>": "󰈦",   // PdfCraft: Reading, organizing and protecting PDFs
+      "class<(.*\\.)?effectcraft>": "󰁨",   // EffectCraft: Motion graphics and visual effects
+      "class<(.*\\.)?anicraft>": "󰤺",   // AniCraft: 2D vector animation
+      "class<(.*\\.)?designcraft>": "󱀁",   // DesignCraft: Page layout and publishing
+      "class<(.*\\.)?figcraft>": "󱍓",   // FigCraft: Interface design and prototyping
+      "class<(.*\\.)?wordcraft>": "󰈬",   // WordCraft: Writing and document design
+      "class<(.*\\.)?soundcraft>": "󱑽",   // SoundCraft: Recording, editing and mixing audio
+      "class<(.*\\.)?deckcraft>": "󰐨",   // DeckCraft: Presentations and slide shows
+      "class<(.*\\.)?cadcraft>": "󰺾",   // CADCraft: Computer-aided design and drafting
+      "class<(.*\\.)?gridcraft>": "󰓱",   // GridCraft: Spreadsheets and data
+      "class<(.*\\.)?texturecraft>": "󰿦",   // TextureCraft: 3D texture painting
+      "class<(.*\\.)?materialcraft>": "󱥔",   // MaterialCraft: Procedural material design
+      "class<(.*\\.)?craft-anything>": "󱌣",   // Craft Anything: Find out how any software works, then craft your own
+      "class<(.*\\.)?solidcraft>": "󰆧",   // SolidCraft: Parametric 3D CAD
+      "class<(.*\\.)?mailcraft>": "󰇰",   // MailCraft: Mail, calendar and contacts
+      // ArtCraft itself (the AI image and video studio), not yet tried here
+      "class<(.*\\.)?artcraft>": "󰙴",
       // moocat (and its SMud windows): its cat-headed speech bubble, as on
       // cata.co (U+E000 in the MoocatIcon font, nix/configuration.nix)
       "class<app.moocat>": "<span font='MoocatIcon'>\ue000</span>"
@@ -94,8 +134,8 @@
       "format": {
         "months":   "<span color='#c0caf5'><b>{}</b></span>",
         "weekdays": "<span color='#7aa2f7'><b>{}</b></span>",
-        "weeks":    "<span color='#565f89'>{:%V}</span>",
-        "days":     "<span color='#a9b1d6'>{}</span>",
+        "weeks":    "{:%V}",
+        "days":     "{}",
         "today":    "<span background='#7aa2f7' color='#1a1b26'><b>{}</b></span>"
       }
     },

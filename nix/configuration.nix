@@ -319,13 +319,10 @@ in
       fuzzel
       git-lfs
       google-chrome
-      hunspellDicts.en_AU # spell checking for LibreOffice
-      kdePackages.okular # PDF annotation/forms/signing (zathura is the default viewer)
       jetbrains.idea
       jetbrains.pycharm
       jetbrains.rider # .NET IDE (uses dotnet-sdk_10 from the PATH)
       jetbrains.rust-rover
-      libreoffice
       maestral # open-source Dropbox client (CLI: `maestral status`, etc.)
       maestral-gui
       # Obsidian draws only a blank window on Electron 43.8.3 (nixpkgs default
@@ -335,7 +332,6 @@ in
       slack
       teams-for-linux # unofficial Microsoft Teams desktop app (wraps the web app)
       snapshot # GNOME camera app: photos and video from the FaceTime HD webcam
-      thunderbird # email (Gmail, Office 365), calendar and contacts
       gimp # image editor
       libation # Audible library manager: downloads audiobooks as plain files
       (callPackage ./tinyjs.nix { }) # tinyjs: JS desktop apps on txiki.js + WebKitGTK (moocat is one)
@@ -549,6 +545,53 @@ in
       categories = [ "AudioVideo" "Audio" "Player" ];
     };
 
+    # ArtCraft apps (AppImages the ArtCraft Launcher installs and updates in
+    # ~/Applications) as handlers for their file types. Their own desktop
+    # entries quote the AppImage's path in Exec, which xdg-open (xdg-mime)
+    # can't resolve, so it skips them; these hidden ones run the app through
+    # craft-open instead, which also follows the launcher's updates. The
+    # defaults are set in ~/.config/mimeapps.list (zathura stays the PDF viewer).
+    xdg.desktopEntries.craft-wordcraft = {
+      name = "WordCraft";
+      comment = "Writing and document design";
+      exec = "craft-open wordcraft %F";
+      icon = "ai.storyteller.wordcraft";
+      noDisplay = true;
+      mimeType = [ "application/vnd.openxmlformats-officedocument.wordprocessingml.document" "application/msword" "application/vnd.oasis.opendocument.text" "application/rtf" "text/rtf" ];
+    };
+    xdg.desktopEntries.craft-gridcraft = {
+      name = "GridCraft";
+      comment = "Spreadsheets and data";
+      exec = "craft-open gridcraft %F";
+      icon = "ai.storyteller.gridcraft";
+      noDisplay = true;
+      mimeType = [ "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" "application/vnd.ms-excel" ];
+    };
+    xdg.desktopEntries.craft-deckcraft = {
+      name = "DeckCraft";
+      comment = "Presentations and slide shows";
+      exec = "craft-open deckcraft %F";
+      icon = "ai.storyteller.deckcraft";
+      noDisplay = true;
+      mimeType = [ "application/vnd.openxmlformats-officedocument.presentationml.presentation" "application/vnd.ms-powerpoint" ];
+    };
+    xdg.desktopEntries.craft-pdfcraft = {
+      name = "PdfCraft";
+      comment = "Reading, organizing and protecting PDFs";
+      exec = "craft-open pdfcraft %F";
+      icon = "ai.storyteller.pdfcraft";
+      noDisplay = true;
+      mimeType = [ "application/pdf" ];
+    };
+    xdg.desktopEntries.craft-mailcraft = {
+      name = "MailCraft";
+      comment = "Mail, calendar and contacts";
+      exec = "craft-open mailcraft %F";
+      icon = "io.github.billsecond.mailcraft";
+      noDisplay = true;
+      mimeType = [ "x-scheme-handler/mailto" "message/rfc822" "text/calendar" "application/x-extension-ics" "x-scheme-handler/webcals" "text/vcard" ];
+    };
+
     # Launcher (Super+D) tidy-up: entries in ~/.local/share/applications
     # override the installed ones with the same file name. Apps stay
     # installed; this only changes what fuzzel lists and what it's called.
@@ -584,8 +627,6 @@ in
         "qt5ct" "qt6ct" # Qt theme settings (managed here)
       ] ++ [
         (hideKeep "nvim" config.programs.neovim.finalPackage)
-        (hideKeep "base" pkgs.libreoffice)
-        (hideKeep "math" pkgs.libreoffice)
         # Still open files/folders, just not listed (Super+Y runs yazi;
         # archives open from Thunar).
         (hideKeep "yazi" pkgs.yazi)
@@ -645,7 +686,7 @@ in
     # Also tell GTK4/libadwaita apps and portals to prefer dark.
     dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
 
-    # Qt apps (VLC, Okular, DBeaver dialogs...): Fusion style with a Tokyo
+    # Qt apps (VLC, DBeaver dialogs...): Fusion style with a Tokyo
     # Night palette through qt5ct/qt6ct, Papirus icons, the same fonts as GTK.
     # Takes effect for apps started after logging in again.
     qt = {
@@ -1064,6 +1105,21 @@ in
     slurp
     wl-clipboard
     satty
+    # craft-open <app> [files or links...]: runs the Craft app (wordcraft,
+    # gridcraft, mailcraft...) the ArtCraft Launcher installed, whatever
+    # version it's at now (its path is in the launcher's installed.json).
+    (writeShellScriptBin "craft-open" ''
+      app="''${1:?usage: craft-open <app> [file or link...]}"
+      shift
+      path="$(${jq}/bin/jq -r --arg a "$app" '.apps[$a].path // empty' \
+        "$HOME/.local/share/artcraft-launcher/installed.json" 2>/dev/null)"
+      if [ -z "$path" ] || [ ! -x "$path" ]; then
+        echo "craft-open: $app isn't installed; install it from the ArtCraft Launcher" >&2
+        command -v notify-send >/dev/null && notify-send "$app isn't installed" "Install it from the ArtCraft Launcher"
+        exit 1
+      fi
+      exec "$path" "$@"
+    '')
     (writeShellScriptBin "screenshot" ''
       set -eu
       dir="$HOME/Pictures/Screenshots"
@@ -1193,7 +1249,7 @@ in
     "Symbols Nerd Font Mono"
   ];
   # Default proportional font for apps that ask for "sans-serif"
-  # (Qt apps like Okular, web pages without their own font, etc.).
+  # (Qt apps, web pages without their own font, etc.).
   fonts.fontconfig.defaultFonts.sansSerif = [
     "IBM Plex Sans"
     "Noto Sans"

@@ -13,20 +13,24 @@ window#waybar {
 #custom-thunar,
 #custom-chrome,
 #custom-terminal,
-#custom-vscode {
+#custom-vscode,
+#custom-artcraft {
   font-size: 17px;
   padding: 0 10px;
 }
 #custom-thunar:hover,
 #custom-chrome:hover,
 #custom-terminal:hover,
-#custom-vscode:hover {
+#custom-vscode:hover,
+#custom-artcraft:hover {
   background: rgba(255, 255, 255, 0.12);
 }
 #custom-thunar   { color: #e0af68; }
 #custom-chrome   { color: #8ab4f8; }
 #custom-terminal { color: #9ece6a; }
-#custom-vscode   { color: #3ea6f2; margin-right: 8px; }
+#custom-vscode   { color: #3ea6f2; }
+/* ArtCraft Launcher: the launcher's own colour from its catalogue */
+#custom-artcraft { color: #bb9af7; margin-right: 8px; }
 
 #workspaces { margin-left: 2px; }
 #workspaces button {
